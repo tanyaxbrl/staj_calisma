@@ -1,9 +1,9 @@
 #!/bin/bash
 
-SRR=SRR18156027
+SRR=ERR3473047
 
 fasterq-dump ${SRR} \
     --progress \
     --skip-technical \
-    --split-spot \
+    --split-files \
     --outdir data/raw/ 
