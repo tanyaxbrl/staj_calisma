@@ -1,4 +1,6 @@
 #!/bin/bash
+# kullanmak icin once conda activate cutadapt yaz
+# ./scripts/rnaseq.sh
 
 SRR=ERR3473047
 
@@ -19,7 +21,7 @@ fastqc data/raw/${SRR}_1.fastq data/raw/${SRR}_2.fastq
 
 mkdir -p data/processed
 
-conda activate cutadapt
+#conda activate cutadapt
 
 cutadapt -q ${Q1} -Q ${Q2} \
 	-m ${MIN_LEN} --trim-n \
