@@ -1,7 +1,8 @@
 #!/bin/bash
 # kullanmak icin once conda activate cutadapt yaz
-# calistirmak için ./scripts/rnaseq.sh yaz 
+# calistirmak icin ./scripts/rnaseq.sh yaz 
 
+SRR=ERR3473047
 ADAPTER1=AGATCGGAAGAG
 ADAPTER2=AGATCGGAAGAG
 THREADS=4
