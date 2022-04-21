@@ -1,12 +1,15 @@
 #!/bin/bash
 
-SRR=ERR3473047
+SRR=SRR7405881
+SRA_OUT=data/SRA
 
-fasterq-dump ${SRR} \
-    --progress \
-    --skip-technical \
-    --split-files \
-    --outdir data/raw/ 
+prefetch ${SRR} -O ${SRA_OUT}
+
+fasterq-dump \
+	--progress \
+	--split-3 \
+	${SRA_OUT}/${SRR} \
+	-O data/raw/ 
 
 fastqc data/raw/${SRR}_1.fastq data/raw/${SRR}_2.fastq
 
