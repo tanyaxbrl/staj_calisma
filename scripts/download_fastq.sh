@@ -1,6 +1,7 @@
 #!/bin/bash
 
-SRR=SRR7405881
+SRR=$1
+
 SRA_OUT=data/SRA
 
 prefetch ${SRR} -O ${SRA_OUT}
@@ -11,5 +12,5 @@ fasterq-dump \
 	${SRA_OUT}/${SRR} \
 	-O data/raw/ 
 
-fastqc data/raw/${SRR}_1.fastq data/raw/${SRR}_2.fastq
+#fastqc data/raw/${SRR}_1.fastq data/raw/${SRR}_2.fastq
 
