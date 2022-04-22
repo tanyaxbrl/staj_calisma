@@ -14,7 +14,7 @@ mkdir -p data/processed
 
 #conda activate cutadapt
 
-cutadapt -q ${Q1} -Q ${Q2} \
+cutadapt -q ${Q1} \
 	-m ${MIN_LEN} --trim-n \
 	-Z -j ${THREADS} \
 	-a ${ADAPTER1} -A ${ADAPTER2} \

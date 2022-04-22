@@ -1,3 +1,4 @@
+#!/bin/bash
 
 SRR=SRR649944
 ADAPTER1=AGATCGGAAGAG
@@ -17,3 +18,4 @@ cutadapt -q ${Q1} -Q ${Q2} \
 	-a ${ADAPTER1} -A ${ADAPTER2} \
 	-o data/processed/${SRR}.fastq.gz \
 	data/raw/${SRR}.fastq
+
