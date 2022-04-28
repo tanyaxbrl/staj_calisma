@@ -1,24 +1,29 @@
 #!/bin/bash
 # kullanmak icin conda activate cutadapt
 
-SRR=ERR3473047
+mkdir -p results
+
+SRR=$1
 
 RAW_OUT=data/raw
+REF_FOLDER=data/ref/
 
 PROCESSED_OUT=data/processed
 
-FASTA=E_coli.fna
+FASTA=GCF_000007565.2_ASM756v2_genomic.fna
+
+bwa index data/ref/${FASTA}
 
 bwa aln -t 4 \
-	${RAW_OUT}/${FASTA} \
-	${PROCESSED_OUT}/${SRR}_1.fastq.gz > ${RAW_OUT}/${SRR}_1_p.sai
+	${REF_FOLDER}/${FASTA} \
+	${PROCESSED_OUT}/${SRR}_1.fastq > results/${SRR}_1_p.sai
 	
 bwa aln -t 4 \
-	${RAW_OUT}/${FASTA} \
-	${PROCESSED_OUT}/${SRR}_2.fastq.gz > ${RAW_OUT}/${SRR}_2_p.sai
+	${REF_FOLDER}/${FASTA} \
+	${PROCESSED_OUT}/${SRR}_2.fastq > results/${SRR}_2_p.sai
 
-bwa sampe ${RAW_OUT}/${FASTA} \
-	${RAW_OUT}/${SRR}_1_p.sai \
-	${RAW_OUT}/${SRR}_2_p.sai \
-	${PROCESSED_OUT}/${SRR}_1.fastq.gz \
-	${PROCESSED_OUT}/${SRR}_2.fastq.gz > results/${SRR}.sam
+bwa sampe ${REF_FOLDER}/${FASTA} \
+	results/${SRR}_1_p.sai \
+	results/${SRR}_2_p.sai \
+	${PROCESSED_OUT}/${SRR}_1.fastq \
+	${PROCESSED_OUT}/${SRR}_2.fastq > results/${SRR}.sam
