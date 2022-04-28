@@ -22,4 +22,6 @@ Bu çalışma aşağıdaki aşamalardan oluşmaktadır:
 + Her gen bölgesinde karşılık gelen RNA miktarı ölçülecek ve elimize matris geçmiş olacak. 
 
 
+Makale:
 
++ https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6066579/
