@@ -22,4 +22,13 @@ Bu çalışma aşağıdaki aşamalardan oluşmaktadır:
 + Her gen bölgesinde karşılık gelen RNA miktarı ölçülecek ve elimize matris geçmiş olacak. 
 
 
+Makale:
 
++ https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6066579/
+
+
+Referans genome:
+
++ https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4702867/
+
++ https://www.ncbi.nlm.nih.gov/assembly/GCA_000007565.2
