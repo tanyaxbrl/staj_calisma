@@ -18,6 +18,6 @@ bwa aln -t 4 \
 	${REF_FOLDER}/${FASTA} \
 	${PROCESSED_OUT}/${SRR}.fastq > results/${SRR}_p.sai
 	
-bwa sampe ${REF_FOLDER}/${FASTA} \
+bwa samse ${REF_FOLDER}/${FASTA} \
 	results/${SRR}_p.sai \
 	${PROCESSED_OUT}/${SRR}.fastq > results/${SRR}.sam
