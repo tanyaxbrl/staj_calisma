@@ -1,11 +1,13 @@
 #!/bin/bash
 
+SRR=$1
+mkdir -p data/ref
 while read LINE
 do 
-        SRR=$(echo "LINE" | cut -f1)
-        END=$(echo "LINE" | cut -f2)
+        SRR=$(echo "$LINE" | cut -f1)
+        END=$(echo "$LINE" | cut -f2)
 
-        if [ ${END} == "PE"
+        if [ ${END} == "PE" ]
         then 
             ./scripts/bwa.sh ${SRR}
         else 
