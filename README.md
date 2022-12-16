@@ -32,3 +32,10 @@ Referans genome:
 + https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4702867/
 
 + https://www.ncbi.nlm.nih.gov/assembly/GCA_000007565.2
+
+# Referans Genom İndirme
+
+İstenilen referans genom, [şu bağlantıdan](https://www.ncbi.nlm.nih.gov/assembly/GCA_000007565.2) indirilebilir.
+
+İndirilen fasta format, çalışılan `Projects/rnaseq/data/ref` içerisine aktarılır. Ardından `gunzip` komutu ile bu sıkıştırılmış dosya açılır.  
+
