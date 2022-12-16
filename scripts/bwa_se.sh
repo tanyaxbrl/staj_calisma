@@ -16,5 +16,5 @@ bwa aln -t 4 \
 	data/processed/${END}/${SRR}.fastq.gz > results/aligment/${END}/${SRR}_p.sai
 	
 bwa samse ${REF_FOLDER}/${FASTA} \
-	results/${SRR}_p.sai \
+	results/aligment/${END}/${SRR}_p.sai \
 	data/processed/${END}/${SRR}.fastq.gz > results/aligment/${END}/${SRR}.sam
