@@ -1,6 +1,8 @@
 #!/bin/bash
 
-SRR=$1
+SRR=${1}
+END=${2}
 
-fastqc data/raw/${SRR}.fastq 
+fastqc data/raw/${END}/${SRR}.fastq
+
 
