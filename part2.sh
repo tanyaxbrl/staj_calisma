@@ -1,44 +1,25 @@
 #!/bin/bash
 
-mkdir -p data/processed
+mkdir -p data/processed/se
+mkdir -p data/processed/pe
 WD=$(pwd -P)
 
 while read LINE
 do
-	SRR=$(echo "$LINE" | cut -f1)
-        END=$(echo "$LINE" | cut -f2)
-	CUT=$(echo "$LINE" | cut -f3)
+	SRR=$(echo "$LINE" | cut -d " " -f1)
+	END=$(echo "$LINE" | cut -d " " -f2)
 
-	if [ ${CUT} == "YES" ]
+	if [[ ${END} == "pe" ]]
 	then
-		echo "CUTADAPT CALISSIN"
+		echo "pe"
+		./scripts/cutadapt_pe.sh ${SRR} ${END}
 	else
-		if [ ${END} == "PE" ]
-		then
-			ln -s ${WD}/data/raw/${SRR}_1.fastq data/processed
-			ln -s ${WD}/data/raw/${SRR}_2.fastq data/processed
-		else
-			ln -s ${WD}/data/raw/${SRR}.fastq data/processed
-		fi
+
+		echo "se"
+		echo ${SRR}
+		echo ${END}
+		./scripts/cutadapt_se.sh ${SRR} ${END}
 	fi
 
-done < data.txt
-
-while read LINE
-do
-        SRR=$(echo "$LINE" | cut -f1)
-        END=$(echo "$LINE" | cut -f2)
-        CUT=$(echo "$LINE" | cut -f3)
-
-	if [ ${CUT} == "YES" ]
-        then
-		if [ ${END} == "PE" ]
-                then
-			./scripts/fastqc_pe.sh ${SRR}
-                else
-
-			./scripts/fastqc_se.sh ${SRR}
-                fi
-	fi
-done < data.txt
+done < data.txt 
 
