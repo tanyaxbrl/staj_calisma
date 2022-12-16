@@ -1,6 +1,8 @@
 #!/bin/bash
 
-SRR=SRR649944
+SRR=${1}
+END=${2}
+
 ADAPTER1=AGATCGGAAGAG
 ADAPTER2=AGATCGGAAGAG
 THREADS=4
@@ -14,7 +16,7 @@ mkdir -p data/processed
 cutadapt -q ${Q1} \
 	-m ${MIN_LEN} --trim-n \
 	-Z -j ${THREADS} \
-	-a ${ADAPTER1} -A ${ADAPTER2} \
-	-o data/processed/${SRR}.fastq.gz \
-	data/raw/${SRR}.fastq
+	-a ${ADAPTER1} \
+	-o data/processed/${END}/${SRR}.fastq.gz \
+	data/raw/${END}/${SRR}.fastq
 
