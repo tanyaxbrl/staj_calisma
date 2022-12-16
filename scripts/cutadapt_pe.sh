@@ -25,3 +25,4 @@ cutadapt -q ${Q1} \
 	data/raw/${END}/${SRR}_1.fastq data/raw/${END}/${SRR}_2.fastq
 
 
+fastqc data/processed/${END}/${SRR}_1.fastq.gz data/processed/${END}/${SRR}_2.fastq.gz
