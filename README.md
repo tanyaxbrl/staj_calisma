@@ -35,7 +35,9 @@ Referans genome:
 
 # Referans Genom İndirme
 
-İstenilen referans genom, [şu bağlantıdan](https://www.ncbi.nlm.nih.gov/assembly/GCA_000007565.2) indirilebilir.
+İstenilen referans genom, [şu bağlantıdan](https://www.ncbi.nlm.nih.gov/genome/?term=txid303[orgn]) indirilebilir.
 
-İndirilen fasta format, çalışılan `Projects/rnaseq/data/ref` içerisine aktarılır. Ardından `gunzip` komutu ile bu sıkıştırılmış dosya açılır.  
+Bu sayfa içerisinde **Genome** bağlantısına tıklayarak dosyayı sıkıştırılmış halde indirebilirsiniz.
+
+İndirilen dosya, `Projects/rnaseq/data/ref` klasörü içerisine aktarılır ve ardından `gunzip` komutu ile bu sıkıştırılmış dosya açılır.  
 
