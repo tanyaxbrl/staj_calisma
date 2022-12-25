@@ -1,0 +1,7 @@
+Module	Section	Sample Name	Source
+FastQC	all_sections	SRR7405885_1	/home/nursenakocaturk/Projects/rnaseq/data/processed/pe/SRR7405885_1_fastqc.zip
+FastQC	all_sections	SRR7405885_2	/home/nursenakocaturk/Projects/rnaseq/data/processed/pe/SRR7405885_2_fastqc.zip
+FastQC	all_sections	SRR7029605	/home/nursenakocaturk/Projects/rnaseq/data/processed/se/SRR7029605_fastqc.zip
+FastQC	all_sections	SRR7029607	/home/nursenakocaturk/Projects/rnaseq/data/processed/se/SRR7029607_fastqc.zip
+FastQC	all_sections	SRR7405886	/home/nursenakocaturk/Projects/rnaseq/data/processed/se/SRR7405886_fastqc.zip
+FastQC	all_sections	SRR7405887	/home/nursenakocaturk/Projects/rnaseq/data/processed/se/SRR7405887_fastqc.zip
