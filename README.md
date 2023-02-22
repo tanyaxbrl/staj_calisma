@@ -34,12 +34,17 @@ Bu çalışma aşağıdaki aşamalardan oluşmaktadır:
 + Gen ekspresyonu belirlenmesi için referans genoma hizalanan dizilerin sayılması
 + Her gene ait olan okumalar sayıldıktan sonra, sağlıklı ve hastalıklı koşulların karşılaştırılması.
 
-Makale:
+## Makale:
 
 + https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6066579/
 
+# Fastqc 
 
-Referans genome:
+Yüksek verimli sıralama işlem hatlarından gelen ham dizi verileri üzerinde bazı kalite kontrolleri yapmak için kullanılan bir araçtır.
+
+Fastqc kommutları `fastqc_se.sh’`, `fastqc_pe.sh` script dosyalarında yer alır.
+
+## Referans genome:
 
 + https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4702867/
 
