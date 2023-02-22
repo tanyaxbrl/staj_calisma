@@ -52,18 +52,6 @@ Ham verileri işlemek için biyoinformatik alanında yaygın olarak kullanılmak
 
 Cutadapt kommutları `cutadapt_se.sh’`, `cutadapt_pe.sh` script dosyalarında yer alır.
 
-# BWA
-
-DNA dizilerini bir referans genoma hizalamak için kullanılan bir yazılım aracıdır. 
-
-Bu, RNA-seq okumalarını referans genoma hizalayacak ve hizalamaları bir SAM dosyası biçiminde çıkaracaktır. 
-
-Bwa kommutları `bwa_se.sh`, `bwa_pe.sh` script dosyalarında yer alır.
-
-Hizalamaları daha fazla işlemek ve analiz etmek için `Samtools` gibi araçlar kullanılır.
-
-Sonraki adımda ise `bcftools` programı kullanılarak varyant çağırma işlemi gerçekleştirilir.
-
 ## Referans genome:
 
 + https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4702867/
@@ -77,4 +65,17 @@ Sonraki adımda ise `bcftools` programı kullanılarak varyant çağırma işlem
 Bu sayfa içerisinde **Genome** bağlantısına tıklayarak dosyayı sıkıştırılmış halde indirebilirsiniz.
 
 İndirilen dosya, `Projects/rnaseq/data/ref` klasörü içerisine aktarılır ve ardından `gunzip` komutu ile bu sıkıştırılmış dosya açılır.  
+
+# BWA
+
+DNA dizilerini bir referans genoma hizalamak için kullanılan bir yazılım aracıdır. 
+
+Bu, RNA-seq okumalarını referans genoma hizalayacak ve hizalamaları bir SAM dosyası biçiminde çıkaracaktır. 
+
+Bwa kommutları `bwa_se.sh`, `bwa_pe.sh` script dosyalarında yer alır.
+
+Hizalamaları daha fazla işlemek ve analiz etmek için `Samtools` gibi araçlar kullanılır.
+
+Sonraki adımda ise `bcftools` programı kullanılarak varyant çağırma işlemi gerçekleştirilir.
+
 
