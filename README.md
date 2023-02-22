@@ -11,16 +11,28 @@ wget https://ftp-trace.ncbi.nlm.nih.gov/sra/sdk/3.0.0/sratoolkit.3.0.0-ubuntu64.
 
 tar -xzf sratoolkit.3.0.0-ubuntu64.tar.gz
 ```
+# Rnaseq
+
+RNA dizileme analizi, gen ekspresyon seviyelerinin analizinde kullanılan bir yöntemdir. 
+
+RNA dizileme teknolojisi sayesinde transkriptomu oluşturan RNA dizilerinin hassas bir şekilde haritası oluşturulur. RNA dizileme analizi, hücrede bulunan hangi genlerin ifade edilip edilmediğini ve hangi genlerin daha çok hangilerinin daha az ifade edildiğini belirler.
+
+Canlıdaki gen anlatımı tespit edilir ve başka örneklerle karşılaştırılır. 
 
 RNA Seq(RNA dizilimi), kodlama yapan ve kodlamayan RNA ekspresyonunu incelemek için kullanılan bir metodolojidir. Her aşamasında çeşitli yazılım araçları kullanılmaktadır. 
 
 Bu çalışma aşağıdaki aşamalardan oluşmaktadır:
 
-+ SRA veri tabanı ile raw fastq (ham fastq) indirilerek işlenecektir. 
-+ Fastq'lar elde edilecek ve elde edilen Fastq'lar bakteri genomuna hizalanacaktır. 
-+ BAM dosyası elde edilecek ve bu dosya kalite kontrolden geçirilecek.
-+ Her gen bölgesinde karşılık gelen RNA miktarı ölçülecek ve elimize matris geçmiş olacak. 
-
++ Biyolojik bir numuneden RNA izolasyonu
++ RNA’nın cDNA’ya dönüştürülmesi
++ cDNA’nın fragmentlerine ayrılması
++ cDNA parçaları kitaplığının hazırlanması
++ Yüksek verimli dizi okuma teknolojisi olan yeni nesil dizileme kullanılarak cDNA kitaplığının dizilenmesi
++ Ham fastq dosyalarının eldesi
++ Dizilerin `cutadapt` ile işlenerek, `fastqc` aracı ile kalite kontrolden geçirilmesi
++ Fastq’ların referans genoma hizalanması ve RNA dizileme verisi eldesi 
++ Gen ekspresyonu belirlenmesi için referans genoma hizalanan dizilerin sayılması
++ Her gene ait olan okumalar sayıldıktan sonra, sağlıklı ve hastalıklı koşulların karşılaştırılması.
 
 Makale:
 
