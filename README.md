@@ -44,6 +44,14 @@ Yüksek verimli sıralama işlem hatlarından gelen ham dizi verileri üzerinde 
 
 Fastqc kommutları `fastqc_se.sh’`, `fastqc_pe.sh` script dosyalarında yer alır.
 
+# Cutadapt
+
+Adaptör dizilerini, primerleri ve diğer istenmeyen dizileri yüksek verimli dizileme verilerinden kaldırmak için kullanılan yazılım aracıdır. 
+
+Ham verileri işlemek için biyoinformatik alanında yaygın olarak kullanılmaktadır.
+
+Cutadapt kommutları `cutadapt_se.sh’`, `cutadapt_pe.sh` script dosyalarında yer alır.
+
 ## Referans genome:
 
 + https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4702867/
