@@ -89,3 +89,11 @@ Genel olarak, BWA ve STAR arasındaki seçim, sıralama verilerinin türüne ve 
 ```
 STAR --runMode genomeGenerate --genomeDir GenomeDir --genomeFastaFiles data/ref/GCF_000412675.1_ASM41267v1_genomic.fna --runThreadN 8
 ```
+
+`gff` ve `gtf` formatları arasında dönüştürme yapmak için çeşitli araçlar mevcuttur. `
+
+`Cufflinks` paketinin komut satırı aracı olan `gffread` kullanılmaktadır.
+
+```
+gffread input.gff -T -o output.gtf
+```
