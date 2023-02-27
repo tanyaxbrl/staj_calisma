@@ -140,11 +140,18 @@ STAR --runMode genomeGenerate --genomeDir data/ref/GenomeDir --genomeFastaFiles 
 
 Hizalamayı aşağıdaki şekilde yapmalıyıoz:
 
+Öncelikle klasörümüz oluşturaluınm:
+
+```bash
+mkdir -p results/star/pe/ERR10671866/
+```
+
+
 ```bash
 
 STAR --runThreadN 4 \
 	--genomeDir data/ref/GenomeDir/ \
 	--readFilesIn data/processed/pe/ERR10671866_1.fastq.gz data/processed/pe/ERR10671866_2.fastq.gz \
-	--outFileNamePrefix ERR10671866 \
+	--outFileNamePrefix results/star/pe/ERR10671866/ERR10671866- \
 	--readFilesCommand zcat
 ```
