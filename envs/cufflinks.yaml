@@ -1,0 +1,5 @@
+name: cufflinks
+channels:
+        - bioconda
+dependencies:
+        - cufflinks
