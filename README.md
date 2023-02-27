@@ -1,6 +1,37 @@
-# rnaseq
+---
+title "RNAseq Çalışması"
+author: "Nursena Kocatürk"
+---
+
+# Giriş
 
 Bu döküman, tez kapsamında hazırlanmış olup; RNA seq analizi publine çalışması yapılmaktadır. Bu çalışmanın sonunda gen bölgelerine karşılık gelen RNA miktarları belirlenecektir. 
+
+## Programların kurulumu
+
+Conda ile programları aşağıdaki gibi kurabilirsiniz.
+
+```bash
+
+conda env create --file envs/rnaseq.yaml
+
+```
+
+Daha sonra çevreyi aktive edin:
+
+```bash
+
+conda activate rnaseq
+```
+
+Eğer Conda çevrenizi güncellemek isterseniz:
+
+
+```bash
+conda env update --file envs/rnaseq.yaml
+
+```
+
 
 ## Sra-toolkit indirme
 
