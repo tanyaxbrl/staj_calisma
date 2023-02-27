@@ -123,6 +123,15 @@ Varyant çağırma veya genotipleme için kısa okunan sıralama verilerini anal
 
 Genel olarak, BWA ve STAR arasındaki seçim, sıralama verilerinin türüne ve analiz hedeflerine bağlıdır. 
 
+
+Öncelikle `Cufflinks` programı içerisinde bulunan `gffread` programı ile gff dosyasını gtf'e çevirelim. 
+
+```bash
+gffread GCF_000412675.1_ASM41267v1_genomic.gff -T -o GCF_000412675.1_ASM41267v1_genomic.gtf
+```
+
+Şimdi de `STAR` aracı ile referans genomu indeksleyelim:
+
 ```
 STAR --runMode genomeGenerate --genomeDir GenomeDir --genomeFastaFiles data/ref/GCF_000412675.1_ASM41267v1_genomic.fna --runThreadN 8
 ```
