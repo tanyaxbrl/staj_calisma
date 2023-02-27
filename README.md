@@ -1,5 +1,5 @@
 ---
-title "RNAseq Çalışması"
+title: "RNAseq Çalışması"
 author: "Nursena Kocatürk"
 ---
 
