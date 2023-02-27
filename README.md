@@ -91,6 +91,12 @@ Cutadapt kommutları `cutadapt_se.sh’`, `cutadapt_pe.sh` script dosyalarında 
 
 # Referans Genom İndirme
 
+Önce veri klasörlerimizi oluşturalım:
+
+```bash
+mkdir -p data/ref
+```
+
 İstenilen referans genom, [şu bağlantıdan](https://www.ncbi.nlm.nih.gov/genome/?term=txid303[orgn]) indirilebilir.
 
 Bu sayfa içerisinde **Genome** bağlantısına tıklayarak dosyayı sıkıştırılmış halde indirebilirsiniz.
