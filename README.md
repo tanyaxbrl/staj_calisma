@@ -1,6 +1,37 @@
-# rnaseq
+---
+title: "RNAseq Çalışması"
+author: "Nursena Kocatürk"
+---
+
+# Giriş
 
 Bu döküman, tez kapsamında hazırlanmış olup; RNA seq analizi publine çalışması yapılmaktadır. Bu çalışmanın sonunda gen bölgelerine karşılık gelen RNA miktarları belirlenecektir. 
+
+## Programların kurulumu
+
+Conda ile programları aşağıdaki gibi kurabilirsiniz.
+
+```bash
+
+conda env create --file envs/rnaseq.yaml
+
+```
+
+Daha sonra çevreyi aktive edin:
+
+```bash
+
+conda activate rnaseq
+```
+
+Eğer Conda çevrenizi güncellemek isterseniz:
+
+
+```bash
+conda env update --file envs/rnaseq.yaml
+
+```
+
 
 ## Sra-toolkit indirme
 
@@ -60,6 +91,12 @@ Cutadapt kommutları `cutadapt_se.sh’`, `cutadapt_pe.sh` script dosyalarında 
 
 # Referans Genom İndirme
 
+Önce veri klasörlerimizi oluşturalım:
+
+```bash
+mkdir -p data/ref
+```
+
 İstenilen referans genom, [şu bağlantıdan](https://www.ncbi.nlm.nih.gov/genome/?term=txid303[orgn]) indirilebilir.
 
 Bu sayfa içerisinde **Genome** bağlantısına tıklayarak dosyayı sıkıştırılmış halde indirebilirsiniz.
@@ -86,14 +123,35 @@ Varyant çağırma veya genotipleme için kısa okunan sıralama verilerini anal
 
 Genel olarak, BWA ve STAR arasındaki seçim, sıralama verilerinin türüne ve analiz hedeflerine bağlıdır. 
 
-```
-STAR --runMode genomeGenerate --genomeDir GenomeDir --genomeFastaFiles data/ref/GCF_000412675.1_ASM41267v1_genomic.fna --runThreadN 8
-```
+
+Öncelikle `Cufflinks` programı içerisinde bulunan `gffread` programı ile gff dosyasını gtf'e çevirelim. 
 
 `gff` ve `gtf` formatları arasında dönüştürme yapmak için çeşitli araçlar mevcuttur. `
 
-`Cufflinks` paketinin komut satırı aracı olan `gffread` kullanılmaktadır.
+```bash
+gffread data/ref/GCF_000412675.1_ASM41267v1_genomic.gff -T -o data/ref/GCF_000412675.1_ASM41267v1_genomic.gtf
+```
+
+Şimdi de `STAR` aracı ile referans genomu indeksleyelim:
 
 ```
-gffread input.gff -T -o output.gtf
+STAR --runMode genomeGenerate --genomeDir data/ref/GenomeDir --genomeFastaFiles data/ref/GCF_000412675.1_ASM41267v1_genomic.fna --runThreadN 8
+```
+
+Hizalamayı aşağıdaki şekilde yapmalıyıoz:
+
+Öncelikle klasörümüz oluşturaluınm:
+
+```bash
+mkdir -p results/star/pe/ERR10671866/
+```
+
+
+```bash
+
+STAR --runThreadN 4 \
+	--genomeDir data/ref/GenomeDir/ \
+	--readFilesIn data/processed/pe/ERR10671866_1.fastq.gz data/processed/pe/ERR10671866_2.fastq.gz \
+	--outFileNamePrefix results/star/pe/ERR10671866/ERR10671866- \
+	--readFilesCommand zcat
 ```

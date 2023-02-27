@@ -1,0 +1,10 @@
+name: rnaseq
+channels:
+        - bioconda
+dependencies:
+        - sra-tools
+        - fastqc
+        - cutadapt
+        - star
+        - bwa
+        - samtools
