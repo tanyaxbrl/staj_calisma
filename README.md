@@ -127,7 +127,7 @@ Genel olarak, BWA ve STAR arasındaki seçim, sıralama verilerinin türüne ve 
 
 İstenilen `gff` dosyası, [şu bağlantıdan](https://www.ncbi.nlm.nih.gov/genome/?term=txid303[orgn]) indirilir.
 
-Bu sayfa içerisinde **GFF** bağlantısına tıklayarak dosyayı indirilebilir.
+Bu sayfa içerisinde **GFF** bağlantısına tıklayarak dosyayı indirebilirsiniz.
 
 ## Cufflinks 
 
