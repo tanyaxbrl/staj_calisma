@@ -121,7 +121,7 @@ BWA, DNA dizilerini bir referans genoma hizalamak için kullanılan bir yazılı
 
 Bu, RNA-seq okumalarını referans genoma hizalayacak ve hizalamaları bir SAM dosyası biçiminde çıkaracaktır. 
 
-Bwa kommutları `bwa_se.sh`ve `bwa_pe.sh` betik dosyalarında yer alır.
+Bwa komutları `bwa_se.sh`ve `bwa_pe.sh` betik dosyalarında yer alır.
 
 Hizalamaları daha fazla işlemek ve analiz etmek için `Samtools` gibi araçlar kullanılır.
 
@@ -129,11 +129,15 @@ Sonraki adımda ise `bcftools` programı kullanılarak varyant çağırma işlem
 
 ### STAR ile hizalama
 
+Bu adım için `part4.sh` betiğini kullanıyoruz. Bu betikte, ilk olarak elde edilen çıktıların kaydedilmesi için `results` klasörü altında `star` klasörünü oluşturmalıyız. Bu klasör içerisinde de tek yönlü (se) ve çift yönlü (pe) okumaların olduğu iki farklı klasör oluşturulur.
+
 STAR, BWA aracı gibi DNA dizilerini referans genoma hizalamak için kullanılan bir araçtır. Özelliklerinde ve uygulamalarında bazı farklılıklar vardır.
 
 Varyant çağırma veya genotipleme için kısa okunan sıralama verilerini analiz ederken, BWA daha iyi bir seçimdir. Gen ifadesi analizi ve alternatif ekleme için RNA-seq verileri analiz ediliyorsa, STAR daha uygun bir araç olacaktır.
 
 Genel olarak, BWA ve STAR arasındaki seçim, sıralama verilerinin türüne ve analiz hedeflerine bağlıdır. 
+
+STAR komutları `star_se.sh`ve `star_pe.sh` betik dosyalarında yer alır.
 
 #### `gff` Dosyası İndirme
 
