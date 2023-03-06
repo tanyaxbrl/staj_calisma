@@ -12,36 +12,22 @@ Bu döküman, tez kapsamında hazırlanmış olup; RNA seq analizi publine çal�
 Conda ile programları aşağıdaki gibi kurabilirsiniz.
 
 ```bash
-
 conda env create --file envs/rnaseq.yaml
-
 ```
 
 Daha sonra çevreyi aktive edin:
 
 ```bash
-
 conda activate rnaseq
 ```
 
 Eğer Conda çevrenizi güncellemek isterseniz:
-
 
 ```bash
 conda env update --file envs/rnaseq.yaml
 
 ```
 
-
-## Sra-toolkit indirme
-
-Conda içindeki `fasterq-dump` sorun çıkarmakta. O yüzden doğrudan `sra-tools` paketinin son versiyonunu indiriyoruz:
-
-```bash
-wget https://ftp-trace.ncbi.nlm.nih.gov/sra/sdk/3.0.0/sratoolkit.3.0.0-ubuntu64.tar.gz
-
-tar -xzf sratoolkit.3.0.0-ubuntu64.tar.gz
-```
 # Rnaseq
 
 RNA dizileme analizi, gen ekspresyon seviyelerinin analizinde kullanılan bir yöntemdir. 
@@ -69,27 +55,16 @@ Bu çalışma aşağıdaki aşamalardan oluşmaktadır:
 
 + https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6066579/
 
-# Fastqc 
 
-Yüksek verimli sıralama işlem hatlarından gelen ham dizi verileri üzerinde bazı kalite kontrolleri yapmak için kullanılan bir araçtır.
+# Bizim RNASeq analiz protokolümüz
 
-Fastqc kommutları `fastqc_se.sh’`, `fastqc_pe.sh` script dosyalarında yer alır.
+## Kullanılacak Referans genomu indirme
 
-# Cutadapt
-
-Adaptör dizilerini, primerleri ve diğer istenmeyen dizileri yüksek verimli dizileme verilerinden kaldırmak için kullanılan yazılım aracıdır. 
-
-Ham verileri işlemek için biyoinformatik alanında yaygın olarak kullanılmaktadır.
-
-Cutadapt kommutları `cutadapt_se.sh’`, `cutadapt_pe.sh` script dosyalarında yer alır.
-
-## Referans genome:
+Referans genomu indirmek için aşağıdaki bağlantıları kullanabiliriz.
 
 + https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4702867/
 
 + https://www.ncbi.nlm.nih.gov/assembly/GCA_000007565.2
-
-# Referans Genom İndirme
 
 Önce veri klasörlerimizi oluşturalım:
 
@@ -103,7 +78,38 @@ Bu sayfa içerisinde **Genome** bağlantısına tıklayarak dosyayı sıkıştı
 
 İndirilen dosya, `Projects/rnaseq/data/ref` klasörü içerisine aktarılır ve ardından `gunzip` komutu ile bu sıkıştırılmış dosya açılır.  
 
-# BWA
+## Yeni nesil dizileme verisi indirme ve kalite kontrol adımı
+
+Bu adım için `part1.sh` betiğini kullanıyoruz. Bu betik, ilk olarak `sra-tools` paketinde bulunan programları ile, istenen fastq dosyalarını indirerek, `fastqc` programı ile kalite kontrol adımlarını gerçekleştirir.
+
+Fastqc programı yüksek verimli DNA dizileme işlem hatlarından gelen ham dizi verileri üzerinde bazı kalite kontrolleri yapmak için kullanılan bir araçtır.
+
+Fastqc komutları `fastqc_se.sh’`, `fastqc_pe.sh` betik dosyalarında yer alır.
+
+Bu kısmı çalıştırmak için ilk olarak `fastq` dosyalarının SRA kodlarının bulunduğu `data.txt` dosyasını oluşturmamız gerekir. Bu dosya içerisinde, indirilecek `fastq` dosyasının SRA kodu ve hangi uçlardan dizilendiği (tek yönlü, single end, se veya çift yönlü, paired end, pe) bilgisini içeren ve boşluk karakteri ile ayrılmış iki sütün olmalıdır:
+
+```
+ERR10671864 pe
+ERR10671865 pe
+```
+
+Bu adımı çalıştırmak için aşağıdaki komut yazılır:
+
+```bash
+./part1.sh
+```
+
+## Fastq dosyalarının işleme adımı (Kısım 2)
+
+Adaptör dizilerini, primerleri ve diğer istenmeyen dizileri yüksek verimli dizileme verilerinden kaldırmak için kullanılan yazılım aracıdır. 
+
+Ham verileri işlemek için biyoinformatik alanında yaygın olarak kullanılmaktadır.
+
+Cutadapt kommutları `cutadapt_se.sh’`, `cutadapt_pe.sh` script dosyalarında yer alır.
+
+## Yeni nesil dizileme verilerinin referans genoma hizalanması
+
+### BWA ile hizalama
 
 DNA dizilerini bir referans genoma hizalamak için kullanılan bir yazılım aracıdır. 
 
@@ -115,7 +121,7 @@ Hizalamaları daha fazla işlemek ve analiz etmek için `Samtools` gibi araçlar
 
 Sonraki adımda ise `bcftools` programı kullanılarak varyant çağırma işlemi gerçekleştirilir.
 
-# STAR
+### STAR ile hizalama
 
 STAR, BWA aracı gibi DNA dizilerini referans genoma hizalamak için kullanılan bir araçtır. Özelliklerinde ve uygulamalarında bazı farklılıklar vardır.
 
@@ -123,13 +129,13 @@ Varyant çağırma veya genotipleme için kısa okunan sıralama verilerini anal
 
 Genel olarak, BWA ve STAR arasındaki seçim, sıralama verilerinin türüne ve analiz hedeflerine bağlıdır. 
 
-## `gff` Dosyası İndirme
+#### `gff` Dosyası İndirme
 
 İstenilen `gff` dosyası, [şu bağlantıdan](https://www.ncbi.nlm.nih.gov/genome/?term=txid303[orgn]) indirilir.
 
 Bu sayfa içerisinde **GFF** bağlantısına tıklayarak dosyayı indirebilirsiniz.
 
-## Cufflinks 
+#### Cufflinks 
 
 Conda ile `cufflinks` programını aşağıdaki gibi kurabilirsiniz.
 
@@ -160,14 +166,15 @@ gffread data/ref/GCF_000412675.1_ASM41267v1_genomic.gff -T -o data/ref/GCF_00041
 STAR --runMode genomeGenerate --genomeDir data/ref/GenomeDir --genomeFastaFiles data/ref/GCF_000412675.1_ASM41267v1_genomic.fna --runThreadN 8
 ```
 
-Hizalamayı aşağıdaki şekilde yapmalıyıoz:
+Hizalamayı aşağıdaki şekilde yapmalıyız:
 
-Öncelikle klasörümüz oluşturaluınm:
+Öncelikle klasörümüz oluşturalım:
 
 ```bash
 mkdir -p results/star/pe/ERR10671866/
 ```
 
+Programı aşağıdaki gibi çalıştırabiliriz:
 
 ```bash
 
