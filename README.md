@@ -107,7 +107,9 @@ Ham verileri işlemek için biyoinformatik alanında yaygın olarak kullanılmak
 
 Cutadapt kommutları `cutadapt_se.sh’`, `cutadapt_pe.sh` script dosyalarında yer alır.
 
-# BWA
+## Yeni nesil dizileme verilerinin referans genoma hizalanması
+
+### BWA ile hizalama
 
 DNA dizilerini bir referans genoma hizalamak için kullanılan bir yazılım aracıdır. 
 
@@ -119,7 +121,7 @@ Hizalamaları daha fazla işlemek ve analiz etmek için `Samtools` gibi araçlar
 
 Sonraki adımda ise `bcftools` programı kullanılarak varyant çağırma işlemi gerçekleştirilir.
 
-# STAR
+### STAR ile hizalama
 
 STAR, BWA aracı gibi DNA dizilerini referans genoma hizalamak için kullanılan bir araçtır. Özelliklerinde ve uygulamalarında bazı farklılıklar vardır.
 
@@ -127,13 +129,13 @@ Varyant çağırma veya genotipleme için kısa okunan sıralama verilerini anal
 
 Genel olarak, BWA ve STAR arasındaki seçim, sıralama verilerinin türüne ve analiz hedeflerine bağlıdır. 
 
-## `gff` Dosyası İndirme
+#### `gff` Dosyası İndirme
 
 İstenilen `gff` dosyası, [şu bağlantıdan](https://www.ncbi.nlm.nih.gov/genome/?term=txid303[orgn]) indirilir.
 
 Bu sayfa içerisinde **GFF** bağlantısına tıklayarak dosyayı indirebilirsiniz.
 
-## Cufflinks 
+#### Cufflinks 
 
 Conda ile `cufflinks` programını aşağıdaki gibi kurabilirsiniz.
 
@@ -164,14 +166,15 @@ gffread data/ref/GCF_000412675.1_ASM41267v1_genomic.gff -T -o data/ref/GCF_00041
 STAR --runMode genomeGenerate --genomeDir data/ref/GenomeDir --genomeFastaFiles data/ref/GCF_000412675.1_ASM41267v1_genomic.fna --runThreadN 8
 ```
 
-Hizalamayı aşağıdaki şekilde yapmalıyıoz:
+Hizalamayı aşağıdaki şekilde yapmalıyız:
 
-Öncelikle klasörümüz oluşturaluınm:
+Öncelikle klasörümüz oluşturalım:
 
 ```bash
 mkdir -p results/star/pe/ERR10671866/
 ```
 
+Programı aşağıdaki gibi çalıştırabiliriz:
 
 ```bash
 
