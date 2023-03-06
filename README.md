@@ -12,36 +12,22 @@ Bu döküman, tez kapsamında hazırlanmış olup; RNA seq analizi publine çal�
 Conda ile programları aşağıdaki gibi kurabilirsiniz.
 
 ```bash
-
 conda env create --file envs/rnaseq.yaml
-
 ```
 
 Daha sonra çevreyi aktive edin:
 
 ```bash
-
 conda activate rnaseq
 ```
 
 Eğer Conda çevrenizi güncellemek isterseniz:
-
 
 ```bash
 conda env update --file envs/rnaseq.yaml
 
 ```
 
-
-## Sra-toolkit indirme
-
-Conda içindeki `fasterq-dump` sorun çıkarmakta. O yüzden doğrudan `sra-tools` paketinin son versiyonunu indiriyoruz:
-
-```bash
-wget https://ftp-trace.ncbi.nlm.nih.gov/sra/sdk/3.0.0/sratoolkit.3.0.0-ubuntu64.tar.gz
-
-tar -xzf sratoolkit.3.0.0-ubuntu64.tar.gz
-```
 # Rnaseq
 
 RNA dizileme analizi, gen ekspresyon seviyelerinin analizinde kullanılan bir yöntemdir. 
@@ -69,11 +55,18 @@ Bu çalışma aşağıdaki aşamalardan oluşmaktadır:
 
 + https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6066579/
 
-# Fastqc 
 
-Yüksek verimli sıralama işlem hatlarından gelen ham dizi verileri üzerinde bazı kalite kontrolleri yapmak için kullanılan bir araçtır.
+# Bizim RNASeq analiz protokolümüz
 
-Fastqc kommutları `fastqc_se.sh’`, `fastqc_pe.sh` script dosyalarında yer alır.
+## Yeni nesil dizileme verisi indirme ve kalite kontrol adımı
+
+Bu adım için `part1.sh` betiğini kullanıyoruz. Bu betik, ilk olarak `sra-tools` paketinde bulunan programları ile, istenen fastq dosyalarını indirerek, `fastqc` programı ile kalite kontrol adımlarını gerçekleştirir.
+
+Fastqc programı yüksek verimli DNA dizileme işlem hatlarından gelen ham dizi verileri üzerinde bazı kalite kontrolleri yapmak için kullanılan bir araçtır.
+
+Fastqc komutları `fastqc_se.sh’`, `fastqc_pe.sh` betik dosyalarında yer alır.
+
+Bu kısmı çalıştırmak için ilk olarak `fastq` dosyalarının SRA kodlarının bulunduğu `data.txt` dosyasını oluşturmamız gerekir. Bu dosya 
 
 # Cutadapt
 
