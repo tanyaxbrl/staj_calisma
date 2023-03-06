@@ -66,7 +66,18 @@ Fastqc programı yüksek verimli DNA dizileme işlem hatlarından gelen ham dizi
 
 Fastqc komutları `fastqc_se.sh’`, `fastqc_pe.sh` betik dosyalarında yer alır.
 
-Bu kısmı çalıştırmak için ilk olarak `fastq` dosyalarının SRA kodlarının bulunduğu `data.txt` dosyasını oluşturmamız gerekir. Bu dosya 
+Bu kısmı çalıştırmak için ilk olarak `fastq` dosyalarının SRA kodlarının bulunduğu `data.txt` dosyasını oluşturmamız gerekir. Bu dosya içerisinde, indirilecek `fastq` dosyasının SRA kodu ve hangi uçlardan dizilendiği (tek yönlü, single end, se veya çift yönlü, paired end, pe) bilgisini içeren ve boşluk karakteri ile ayrılmış iki sütün olmalıdır:
+
+```
+ERR10671864 pe
+ERR10671865 pe
+```
+
+Bu adımı çalıştırmak için aşağıdaki komut yazılır:
+
+```bash
+./part1.sh
+```
 
 # Cutadapt
 
