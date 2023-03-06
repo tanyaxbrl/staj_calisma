@@ -116,6 +116,28 @@ Varyant çağırma veya genotipleme için kısa okunan sıralama verilerini anal
 
 Genel olarak, BWA ve STAR arasındaki seçim, sıralama verilerinin türüne ve analiz hedeflerine bağlıdır. 
 
+## `gff` Dosyası İndirme
+
+İstenilen `gff` dosyası, [şu bağlantıdan](https://www.ncbi.nlm.nih.gov/genome/?term=txid303[orgn]) indirilir.
+
+Bu sayfa içerisinde **GFF** bağlantısına tıklayarak dosyayı indirebilirsiniz.
+
+## Cufflinks 
+
+Conda ile `cufflinks` programını aşağıdaki gibi kurabilirsiniz.
+
+```bash
+
+conda env create --file envs/cufflinks.yaml
+
+```
+
+Daha sonra çevreyi aktive edin:
+
+```bash
+
+conda activate cufflinks
+```
 
 Öncelikle `Cufflinks` programı içerisinde bulunan `gffread` programı ile gff dosyasını gtf'e çevirelim. 
 
