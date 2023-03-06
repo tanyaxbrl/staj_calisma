@@ -58,6 +58,26 @@ Bu çalışma aşağıdaki aşamalardan oluşmaktadır:
 
 # Bizim RNASeq analiz protokolümüz
 
+## Kullanılacak Referans genomu indirme
+
+Referans genomu indirmek için aşağıdaki bağlantıları kullanabiliriz.
+
++ https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4702867/
+
++ https://www.ncbi.nlm.nih.gov/assembly/GCA_000007565.2
+
+Önce veri klasörlerimizi oluşturalım:
+
+```bash
+mkdir -p data/ref
+```
+
+İstenilen referans genom, [şu bağlantıdan](https://www.ncbi.nlm.nih.gov/genome/?term=txid303[orgn]) indirilebilir.
+
+Bu sayfa içerisinde **Genome** bağlantısına tıklayarak dosyayı sıkıştırılmış halde indirebilirsiniz.
+
+İndirilen dosya, `Projects/rnaseq/data/ref` klasörü içerisine aktarılır ve ardından `gunzip` komutu ile bu sıkıştırılmış dosya açılır.  
+
 ## Yeni nesil dizileme verisi indirme ve kalite kontrol adımı
 
 Bu adım için `part1.sh` betiğini kullanıyoruz. Bu betik, ilk olarak `sra-tools` paketinde bulunan programları ile, istenen fastq dosyalarını indirerek, `fastqc` programı ile kalite kontrol adımlarını gerçekleştirir.
@@ -79,33 +99,13 @@ Bu adımı çalıştırmak için aşağıdaki komut yazılır:
 ./part1.sh
 ```
 
-# Cutadapt
+## Fastq dosyalarının işleme adımı (Kısım 2)
 
 Adaptör dizilerini, primerleri ve diğer istenmeyen dizileri yüksek verimli dizileme verilerinden kaldırmak için kullanılan yazılım aracıdır. 
 
 Ham verileri işlemek için biyoinformatik alanında yaygın olarak kullanılmaktadır.
 
 Cutadapt kommutları `cutadapt_se.sh’`, `cutadapt_pe.sh` script dosyalarında yer alır.
-
-## Referans genome:
-
-+ https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4702867/
-
-+ https://www.ncbi.nlm.nih.gov/assembly/GCA_000007565.2
-
-# Referans Genom İndirme
-
-Önce veri klasörlerimizi oluşturalım:
-
-```bash
-mkdir -p data/ref
-```
-
-İstenilen referans genom, [şu bağlantıdan](https://www.ncbi.nlm.nih.gov/genome/?term=txid303[orgn]) indirilebilir.
-
-Bu sayfa içerisinde **Genome** bağlantısına tıklayarak dosyayı sıkıştırılmış halde indirebilirsiniz.
-
-İndirilen dosya, `Projects/rnaseq/data/ref` klasörü içerisine aktarılır ve ardından `gunzip` komutu ile bu sıkıştırılmış dosya açılır.  
 
 # BWA
 
