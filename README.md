@@ -113,11 +113,15 @@ Cutadapt komutları `cutadapt_se.sh’`, `cutadapt_pe.sh` betik dosyalarında ye
 
 ### BWA ile hizalama
 
-DNA dizilerini bir referans genoma hizalamak için kullanılan bir yazılım aracıdır. 
+Bu adım için `part3.sh` betiğini kullanıyoruz. Bu betikte, ilk olarak elde edilen çıktıların kaydedilmesi için `results` klasörü altında `aligment` klasörünü oluşturmalıyız. Bu klasör içerisinde de tek yönlü (se) ve çift yönlü (pe) okumaların olduğu iki farklı klasör oluşturulur.
+
+`BWA` programı ile yeni nesil dizileme verilerinin referans genoma hizalanma adımı gerçekleştirilir.
+
+BWA, DNA dizilerini bir referans genoma hizalamak için kullanılan bir yazılım aracıdır. 
 
 Bu, RNA-seq okumalarını referans genoma hizalayacak ve hizalamaları bir SAM dosyası biçiminde çıkaracaktır. 
 
-Bwa kommutları `bwa_se.sh`, `bwa_pe.sh` script dosyalarında yer alır.
+Bwa kommutları `bwa_se.sh`ve `bwa_pe.sh` betik dosyalarında yer alır.
 
 Hizalamaları daha fazla işlemek ve analiz etmek için `Samtools` gibi araçlar kullanılır.
 
