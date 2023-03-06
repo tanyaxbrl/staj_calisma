@@ -84,7 +84,7 @@ Bu adım için `part1.sh` betiğini kullanıyoruz. Bu betik, ilk olarak `sra-too
 
 Fastqc programı yüksek verimli DNA dizileme işlem hatlarından gelen ham dizi verileri üzerinde bazı kalite kontrolleri yapmak için kullanılan bir araçtır.
 
-Fastqc komutları `fastqc_se.sh’`, `fastqc_pe.sh` betik dosyalarında yer alır.
+Fastqc komutları `fastqc_se.sh’` ve `fastqc_pe.sh` betik dosyalarında yer alır.
 
 Bu kısmı çalıştırmak için ilk olarak `fastq` dosyalarının SRA kodlarının bulunduğu `data.txt` dosyasını oluşturmamız gerekir. Bu dosya içerisinde, indirilecek `fastq` dosyasının SRA kodu ve hangi uçlardan dizilendiği (tek yönlü, single end, se veya çift yönlü, paired end, pe) bilgisini içeren ve boşluk karakteri ile ayrılmış iki sütün olmalıdır:
 
@@ -107,7 +107,7 @@ Bu adım için `part2.sh` betiğini kullanıyoruz. Bu betikte, ilk olarak `data`
 
 Cutadapt, adaptör dizilerini, primerleri ve diğer istenmeyen dizileri yüksek verimli dizileme verilerinden kaldırmak için kullanılan yazılım aracıdır. 
 
-Cutadapt komutları `cutadapt_se.sh’`, `cutadapt_pe.sh` betik dosyalarında yer alır.
+Cutadapt komutları `cutadapt_se.sh’`ve `cutadapt_pe.sh` betik dosyalarında yer alır.
 
 ## Yeni nesil dizileme verilerinin referans genoma hizalanması
 
