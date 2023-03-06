@@ -101,11 +101,13 @@ Bu adımı çalıştırmak için aşağıdaki komut yazılır:
 
 ## Fastq dosyalarının işleme adımı (Kısım 2)
 
-Adaptör dizilerini, primerleri ve diğer istenmeyen dizileri yüksek verimli dizileme verilerinden kaldırmak için kullanılan yazılım aracıdır. 
+Bu adım için `part2.sh` betiğini kullanıyoruz. Bu betikte, ilk olarak `data` klasörü içerisinde işlenmiş fastq dosyaların kaydedileceği `processed` isimli bir klasör oluşturmalıyız. Bu klasör içerisinde de tek yönlü (se) ve çift yönlü (pe) okumaların olduğu iki farklı klasör oluşturmalıyız. 
 
-Ham verileri işlemek için biyoinformatik alanında yaygın olarak kullanılmaktadır.
+`Cutadapt` programı ile fastqc dosyalarının işleme adımları gerçekleştirilir. 
 
-Cutadapt kommutları `cutadapt_se.sh’`, `cutadapt_pe.sh` script dosyalarında yer alır.
+Cutadapt, adaptör dizilerini, primerleri ve diğer istenmeyen dizileri yüksek verimli dizileme verilerinden kaldırmak için kullanılan yazılım aracıdır. 
+
+Cutadapt komutları `cutadapt_se.sh’`, `cutadapt_pe.sh` betik dosyalarında yer alır.
 
 ## Yeni nesil dizileme verilerinin referans genoma hizalanması
 
