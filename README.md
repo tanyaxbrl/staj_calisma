@@ -194,3 +194,38 @@ STAR --runThreadN 4 \
 	--outFileNamePrefix results/star/pe/ERR10671866/ERR10671866- \
 	--readFilesCommand zcat
 ```
+
+#### STAR aracı çıktıları
+
+##### Log.out
+
+Çalıştırma hakkında birçok ayrıntılı bilgi içeren dosya. Bu dosya en çok sorun giderme ve hata ayıklama için kullanışlıdır.
+
+##### Log.progress.out
+
+İşlenen okuma sayısı, eşlenen okumaların vb. gibi iş ilerleme istatistiklerini raporlar. 
+
+##### Log.final.out
+
+Haritalama işi tamamlandıktan sonra özet haritalama istatistikleri, kalite kontrolü için çok faydalıdır. İstatistikler her okuma için (tek veya çift uç) hesaplanır ve ardından tüm okumalar üzerinden toplanır veya ortalaması alınır. 
+
+##### Aligned.out.sam
+
+Standart SAM biçimindeki hizalamalar.
+
+##### SJ.out.tab
+
+Sekmeyle ayrılmış formatta yüksek güvenliğe sahip daraltılmış ekleme bağlantılarını içerir. STAR'ın bağlantı noktası başlangıcını/bitişini intronik bazlar olarak tanımlarken, diğer birçok yazılımın bunları eksonik bazlar olarak tanımladığını unutmayın. Sütunlar şu anlama gelir:
+
++ Sütun 1: kromozom
++ Sütun 2: intronun ilk tabanı (1 tabanlı)
++ Sütun 3: intronun son tabanı (1 tabanlı)
++ Sütun 4: iplikçik (0: tanımsız, 1: +, 2: -)
++ Sütun 5: intron motifi: 0: kanonik olmayan; 1: GT/AG, 2: CT/AC, 3: GC/AG, 4: CT/GC, 5: AT/AC, 6: GT/AT
++ Sütun 6: 0: açıklamasız, 1: ekleme bağlantıları veri tabanında açıklamalı. 2 geçişli modda, 1. geçişte algılanan bağlantıların, GTF'den açıklamalı bağlantılara ek olarak açıklamalı olarak raporlandığını unutmayın.
++ Sütun 7: bağlantı noktasından geçen benzersiz eşleme okumalarının sayısı
++ Sütun 8: bağlantı noktasından geçen çoklu eşleme okuma sayısı
++ Sütun 9: maksimum eklenmiş hizalama çıkıntısı
+
+
+
