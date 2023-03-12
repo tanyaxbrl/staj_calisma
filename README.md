@@ -227,5 +227,22 @@ Sekmeyle ayrılmış formatta yüksek güvenliğe sahip daraltılmış ekleme ba
 + Sütun 8: bağlantı noktasından geçen çoklu eşleme okuma sayısı
 + Sütun 9: maksimum eklenmiş hizalama çıkıntısı
 
+### Genom Tarayıcısı
 
+Hizalama adımından sonra genom tarayıcısı adımı yer almaktadır. Okuma hizalamaları (BAM, SAM formatlarında), kullanıcıların bir grafik arayüz kullanarak genomik dizilere ve ek açıklama verilerine göz atmasına, bunları aramasına, almasına ve analiz etmesine olanak tanıyan bir program olan bir genom tarayıcısında görüntülenebilir.
 
+İki tür genom tarayıcısı vardır:
+
+#### Web tabanlı genom tarayıcıları:
+
++ UCSC Genom Tarayıcısı
++ Ensembl Genom Tarayıcısı
++ NCBI Genom Veri Görüntüleyici
+
+#### Masaüstü uygulamaları (bazıları web tabanlı bir genom tarayıcısı oluşturmak için de kullanılabilir):
+
++ JBrowse
++ GBrowse
++ IGV
+
+Küçük boyutlu veriler doğrudan genom tarayıcısına yüklenebilirken, büyük dosyalar normalde tarayıcı tarafından erişilebilen bir web sunucusuna yerleştirilir. STAR eşleyici tarafından üretilen BAM dosyalarını keşfetmek için öncelikle dosyaları sıralamamız ve indekslememiz gerekir. Bizim durumumuzda, sıralama zaten STAR tarafından yapılmıştır çünkü hizalamaları koordinatlara göre sıralanmış BAM dosyalarına veririz. 
