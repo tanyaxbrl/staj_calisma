@@ -2,8 +2,8 @@ SRR7029607 se
 SRR7029605 se
 SRR7405887 se
 SRR7405886 se
-SRR7405885 pe
-ERR10671864 pe
-ERR10671865 pe
-ERR10671866 pe
-ERR10671867 pe
+SRR7405885 pe zinc
+ERR10671864 pe chemical membrane
+ERR10671865 pe chemical membrane
+ERR10671866 pe chemical membrane
+ERR10671867 pe chemical membrane
