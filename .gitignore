@@ -1,3 +1,4 @@
+*Rproj
 data/
 results/
 *fastq
@@ -134,3 +135,4 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+.Rproj.user
