@@ -8,7 +8,7 @@ THREADS=8
 
 STAR --runMode genomeGenerate \
     --genomeDir data/ref/GenomeDir \
-    --genomeFastaFiles ${REFERENCE} \
+    --genomeFastaFiles data/ref/${REFERENCE} \
     --runThreadN ${THREADS}
         
 while read LINE
