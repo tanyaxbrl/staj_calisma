@@ -1,7 +1,7 @@
-SRR7029607 se
-SRR7029605 se
-SRR7405887 se
-SRR7405886 se
+SRR7029607 se control
+SRR7029605 se control 
+SRR7405887 se zinc
+SRR7405886 se zinc
 SRR7405885 pe zinc
 ERR10671864 pe chemical membrane
 ERR10671865 pe chemical membrane
