@@ -72,7 +72,7 @@ Referans genomu indirmek için aşağıdaki bağlantıları kullanabiliriz.
 mkdir -p data/ref
 ```
 
-İstenilen referans genom, [şu bağlantıdan](https://www.ncbi.nlm.nih.gov/genome/?term=txid303[orgn]) indirilebilir.
+İstenilen referans genom fasta dosyası olarak, [şu bağlantıdan](https://www.ncbi.nlm.nih.gov/genome/?term=txid303[orgn]) indirilebilir.
 
 Bu sayfa içerisinde **Genome** bağlantısına tıklayarak dosyayı sıkıştırılmış halde indirebilirsiniz.
 
