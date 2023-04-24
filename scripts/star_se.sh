@@ -14,7 +14,7 @@ STAR --runThreadN ${THREADS} \
 	--genomeDir ${REF_FOLDER}/GenomeDir/ \
 	--readFilesIn \
     data/processed/${END}/${SRR}.fastq.gz \
-	--outFileNamePrefix results/star/${END}/${SRR}- \
+	--outFileNamePrefix results/star/${END}/${SRR}/${SRR}- \
 	--readFilesCommand zcat
 
 samtools view -q30 -F4 -Sb results/star/${END}/${SRR}/${SRR}-Aligned.out.sam > results/star/${END}/${SRR}/${SRR}.bam
