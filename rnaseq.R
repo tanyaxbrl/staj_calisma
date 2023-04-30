@@ -1,5 +1,5 @@
 library("Rsamtools")
-filenames <- dir("results/star/pe/", pattern = "sorted.bam", full.names = T)
+filenames <- dir("results/star/", pattern = "sorted.bam", full.names = T, recursive = T)
 
 
 bamfiles <- BamFileList(filenames, yieldSize=2000000)
@@ -23,3 +23,4 @@ se <- summarizeOverlaps(features=ebg,
                         ignore.strand=TRUE,
                         fragments=TRUE )
 
+write.table(x = count, file = "counts.txt", col.names = T, row.names = T, quote = F)
