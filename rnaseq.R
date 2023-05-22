@@ -28,3 +28,14 @@ se <- summarizeOverlaps(features=ebg,
 se <- as.data.frame(se)
 
 write.table(x = se, file = "counts.txt", col.names = T, row.names = T, quote = F)
+
+countData <- read.csv('counts.txt', header = TRUE, sep = ",")
+
+metaData <- read.csv('data.txt', header = TRUE, sep = ",")
+
+dds <- DESeqDataSetFromMatrix(countData=countData, 
+                              colData=metaData, 
+                              design=~dex, tidy = TRUE)
+
+countData <- as.matrix(read.csv("counts.", row.names = 1))
+
