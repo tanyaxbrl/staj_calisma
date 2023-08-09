@@ -78,6 +78,7 @@ gunzip GCA_000007565.2_ASM756v2_genomic.fna.gz
 
 wget https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/007/565/GCA_000007565.2_ASM756v2/GCA_000007565.2_ASM756v2_genomic.gff.gz
 
+cd ../..
 ```
 
 İndirdiğimiz referans genom dosyasını gunzip ile açmalıyız. Yoksa indeksleme işlemi düzgün bir şekilde gerçekleşmez.

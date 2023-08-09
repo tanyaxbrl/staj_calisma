@@ -3,7 +3,7 @@
 mkdir -p results/alignment/pe
 mkdir -p results/alignment/se
 
-REFERENCE=GCF_000412675.1_ASM41267v1_genomic.fna
+REFERENCE=GCA_000007565.2_ASM756v2_genomic.fna
 
 bwa index data/ref/${REFERENCE}
 
