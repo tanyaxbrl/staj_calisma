@@ -1,7 +1,7 @@
 #!/bin/bash
 
-mkdir -p results/aligment/pe
-mkdir -p results/aligment/se
+mkdir -p results/alignment/pe
+mkdir -p results/alignment/se
 
 REFERENCE=GCF_000412675.1_ASM41267v1_genomic.fna
 

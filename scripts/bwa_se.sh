@@ -2,7 +2,7 @@
 # kullanmak icin conda activate cutadapt
 
 mkdir -p results
-mkdir -p results/aligment
+mkdir -p results/alignment
 SRR=$1
 END=$2
 FASTA=$3
@@ -13,8 +13,13 @@ REF_FOLDER=data/ref/
 
 bwa aln -t 4 \
 	${REF_FOLDER}/${FASTA} \
-	data/processed/${END}/${SRR}.fastq.gz > results/aligment/${END}/${SRR}_p.sai
+	data/processed/${END}/${SRR}.fastq.gz > results/alignment/${END}/${SRR}_p.sai
 	
-bwa sampe ${REF_FOLDER}/${FASTA} \
-	results/aligment/${END}/${SRR}_p.sai \
-	data/processed/${END}/${SRR}.fastq.gz > results/aligment/${END}/${SRR}.sam
+bwa samse ${REF_FOLDER}/${FASTA} \
+	results/alignment/${END}/${SRR}_p.sai \
+	data/processed/${END}/${SRR}.fastq.gz | samtools view -F3 -q30 -Sb > results/alignment/${END}/${SRR}.bam
+
+samtools sort results/alignment/${END}/${SRR}.bam -o results/alignment/${END}/${SRR}.sorted.bam
+
+samtools index results/alignment/${END}/${SRR}.sorted.bam
+
