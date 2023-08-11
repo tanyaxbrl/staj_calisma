@@ -66,6 +66,9 @@ git clone
 cd rnaseq
 ```
 
+Kullanacağımız ham DNA okumaları ve referans genom bilgileri `data` içerisinde yer almalıdır. İşlenmiş DNA okumaları, ve diğer çıktı dosyaları ise `results` klasörü içinde yer alacaktır.
+
+
 ## DNA okumalarını indirme
 
 Bu çalışma kapsamında örnek bir veri seti oluşturulmuştur. Elde edilen DNA okumalarını Kırdök Lab Google Drive klasöründen indirebilirsiniz. Daha sonra `data/ref` isminde bir klasör oluşturun ve bu `fastq.gz` dosyalarını oluştruduğunuz klasör içerisinde kaydediniz:
@@ -121,9 +124,11 @@ Bu adımı çalıştırmak için aşağıdaki komut yazılır:
 ./part1.sh
 ```
 
+`sra-tools` ile conda arasındakı uyumsuzluk nedeniyle, DNA okumlarının indirilmesi adımı şimdilik atlanmıştır.
+
 ## Fastq dosyalarının işleme adımı (Kısım 2)
 
-Bu adım için `part2.sh` betiğini kullanıyoruz. Bu betikte, ilk olarak `data` klasörü içerisinde işlenmiş fastq dosyaların kaydedileceği `processed` isimli bir klasör oluşturmalıyız. Bu klasör içerisinde de tek yönlü (se) ve çift yönlü (pe) okumaların olduğu iki farklı klasör oluşturmalıyız. 
+Bu adım için `part2.sh` betiğini kullanıyoruz. Bu betikte, ilk olarak `results` klasörü içerisinde işlenmiş fastq dosyaların kaydedileceği `processed` isimli bir klasör oluşturmalıyız. Bu klasör içerisinde de tek yönlü (se) ve çift yönlü (pe) okumaların olduğu iki farklı klasör oluşturmalıyız. 
 
 `Cutadapt` programı ile fastqc dosyalarının işleme adımları gerçekleştirilir. 
 
