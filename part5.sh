@@ -1,7 +1,6 @@
 #!/bin/bash
 
-mkdir -p results/star/pe
-mkdir -p results/star/se
+mkdir -p results/alignment/bowtie2
 
 REFERENCE=GCA_000007565.2_ASM756v2_genomic.fna
 THREADS=4
