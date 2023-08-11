@@ -6,7 +6,7 @@ author: "Nursena Kocatürk"
 
 # Giriş
 
-Bu döküman, tez kapsamında hazırlanmış olup; RNA seq analizi publine çalışması yapılmaktadır. Bu çalışmanın sonunda gen bölgelerine karşılık gelen RNA miktarları belirlenecektir. 
+Bu döküman, tez kapsamında hazırlanmış olup; RNA dizileme analizi çalışması için bir pilot projedir. Bu çalışmanın sonunda gen bölgelerine karşılık gelen RNA miktarları belirlenecektir. 
 
 ## Programların kurulumu
 
@@ -59,9 +59,24 @@ Bu çalışma aşağıdaki aşamalardan oluşmaktadır:
 
 # Bizim RNASeq analiz protokolümüz
 
+Öncelikle bu git deposunu klonlayın ve klasör içerisine girin:
+
+```bash
+git clone 
+cd rnaseq
+```
+
+## DNA okumalarını indirme
+
+Bu çalışma kapsamında örnek bir veri seti oluşturulmuştur. Elde edilen DNA okumalarını Kırdök Lab Google Drive klasöründen indirebilirsiniz. Daha sonra `data/ref` isminde bir klasör oluşturun ve bu `fastq.gz` dosyalarını oluştruduğunuz klasör içerisinde kaydediniz:
+
+```bash
+mkdir -p data/raw
+```
+
 ## Kullanılacak Referans genomu indirme
 
-Referans genomu indirmek için aşağıdaki bağlantıları kullanabiliriz.
+Referans genomu indirmek için aşağıdaki bağlantıları kullanabiliriz. 
 
 Kullanılacak referans genom ve genom anotasyon dosyalarını aşağıdaki gibi indirebiliriz:
 
@@ -77,6 +92,8 @@ wget https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/007/565/GCA_000007565.2_AS
 gunzip GCA_000007565.2_ASM756v2_genomic.fna.gz
 
 wget https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/007/565/GCA_000007565.2_ASM756v2/GCA_000007565.2_ASM756v2_genomic.gff.gz
+
+gunzip GCA_000007565.2_ASM756v2_genomic.gff.gz
 
 cd ../..
 ```
