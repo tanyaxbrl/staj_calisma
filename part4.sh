@@ -1,10 +1,9 @@
 #!/bin/bash
 
-mkdir -p results/star/pe
-mkdir -p results/star/se
+mkdir -p results/alignment/star
 
-REFERENCE=GCF_000412675.1_ASM41267v1_genomic.fna
-THREADS=8
+REFERENCE=GCA_000007565.2_ASM756v2_genomic.fna
+THREADS=4
 
 STAR --runMode genomeGenerate \
     --genomeDir data/ref/GenomeDir \
