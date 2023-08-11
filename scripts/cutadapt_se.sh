@@ -9,16 +9,14 @@ THREADS=4
 Q1=20
 MIN_LEN=10
 
-mkdir -p data/processed
-
 #conda activate cutadapt
 
 cutadapt -q ${Q1} \
 	-m ${MIN_LEN} --trim-n \
 	-Z -j ${THREADS} \
 	-a ${ADAPTER1} \
-	-o data/processed/${END}/${SRR}.fastq.gz \
-	data/raw/${END}/${SRR}.fastq
+	-o results/processed/${END}/${SRR}.fastq.gz \
+	data/raw/${END}/${SRR}.fastq.gz
 
 
-fastqc data/processed/${END}/${SRR}.fastq.gz
+fastqc results/processed/${END}/${SRR}.fastq.gz

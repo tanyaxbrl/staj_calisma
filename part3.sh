@@ -1,7 +1,6 @@
 #!/bin/bash
 
-mkdir -p results/alignment/pe
-mkdir -p results/alignment/se
+mkdir -p results/alignment/bwa/
 
 REFERENCE=GCA_000007565.2_ASM756v2_genomic.fna
 
