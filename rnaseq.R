@@ -1,6 +1,6 @@
 library("Rsamtools")
 
-filenames <- dir("results/star/", pattern = "sorted.bam", full.names = T, recursive = T)
+filenames <- dir("results/alignment/", pattern = "sorted.bam", full.names = T, recursive = T)
 
 bamfiles <- BamFileList(filenames, yieldSize=2000000)
 

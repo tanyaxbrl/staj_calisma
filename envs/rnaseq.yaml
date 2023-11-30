@@ -8,3 +8,8 @@ dependencies:
         - star
         - bwa
         - samtools
+        - r
+        - bioconductor-rsamtools 
+        - bioconductor-genomicalignments 
+        - bioconductor-biocparallel
+        - bioconductor-genomicfeatures

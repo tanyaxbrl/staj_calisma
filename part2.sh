@@ -1,8 +1,7 @@
 #!/bin/bash
 
-mkdir -p data/processed/se
-mkdir -p data/processed/pe
-WD=$(pwd -P)
+mkdir -p results/processed/se
+mkdir -p results/processed/pe
 
 while read LINE
 do

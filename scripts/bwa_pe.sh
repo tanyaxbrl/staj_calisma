@@ -14,14 +14,20 @@ REF_FOLDER=data/ref/
 
 bwa aln -t 4 \
 	${REF_FOLDER}/${FASTA} \
-	data/processed/${END}/${SRR}_1.fastq.gz > results/aligment/${END}/${SRR}_1_p.sai
+	results/processed/${END}/${SRR}_1.fastq.gz > results/aligment/bwa/${SRR}_1_p.sai
 	
 bwa aln -t 4 \
 	${REF_FOLDER}/${FASTA} \
-	data/processed/${END}/${SRR}_2.fastq.gz > results/aligment/${END}/${SRR}_2_p.sai
+	results/processed/${END}/${SRR}_2.fastq.gz > results/aligment/bwa/${SRR}_2_p.sai
 
 bwa sampe ${REF_FOLDER}/${FASTA} \
-	results/aligment/${END}/${SRR}_1_p.sai \
-	results/aligment/${END}/${SRR}_2_p.sai \
-	data/processed/${END}/${SRR}_1.fastq.gz \
-	data/processed/${END}/${SRR}_2.fastq.gz > results/aligment/${END}/${SRR}.sam
+	results/aligment/bwa/${SRR}_1_p.sai \
+	results/aligment/bwa/${SRR}_2_p.sai \
+	results/processed/${END}/${SRR}_1.fastq.gz \
+	results/processed/${END}/${SRR}_2.fastq.gz | samtools view -F2 -q30 -Sb > results/aligment/bwa/${SRR}.sam
+	
+samtools sort results/alignment/bwa/${SRR}.bam -o results/alignment/bwa/${SRR}.sorted.bam
+
+samtools index results/alignment/bwa/${SRR}.sorted.bam
+
+rm  results/aligment/bwa/${SRR}_1_p.sai results/aligment/bwa/${SRR}_2_p.sai

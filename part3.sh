@@ -1,9 +1,8 @@
 #!/bin/bash
 
-mkdir -p results/aligment/pe
-mkdir -p results/aligment/se
+mkdir -p results/alignment/bwa/
 
-REFERENCE=GCF_000412675.1_ASM41267v1_genomic.fna
+REFERENCE=GCA_000007565.2_ASM756v2_genomic.fna
 
 bwa index data/ref/${REFERENCE}
 

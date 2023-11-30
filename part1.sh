@@ -5,15 +5,14 @@ do
 	SRR=$(echo "$LINE" | cut -d " " -f1)
 	END=$(echo "$LINE" | cut -d " " -f2)
 
-	./scripts/download_fastq.sh ${SRR} ${END}
-	echo $END
-	if [[ ${END} == "pe" ]]
+# 	sra-tools conda ile hata veriyor, o yuzden bu kismi yapmayalim artik
+#	./scripts/download_fastq.sh ${SRR} ${END}
+
+	if [[ "${END}" == "pe" ]]
 	then
-		echo "pe"
-		./scripts/fastqc_pe.sh ${SRR} ${END}
+		fastqc data/raw/${END}/${SRR}_1.fastq.gz data/raw/${END}/${SRR}_2.fastq.gz
 	else
-		echo "se"
-		./scripts/fastqc_se.sh ${SRR} ${END}
+		fastqc data/raw/${END}/${SRR}.fastq.gz
 	fi
 
 done < data.txt 

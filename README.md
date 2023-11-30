@@ -1,11 +1,12 @@
 ---
 title: "RNAseq Çalışması"
 author: "Nursena Kocatürk"
+
 ---
 
 # Giriş
 
-Bu döküman, tez kapsamında hazırlanmış olup; RNA seq analizi publine çalışması yapılmaktadır. Bu çalışmanın sonunda gen bölgelerine karşılık gelen RNA miktarları belirlenecektir. 
+Bu döküman, tez kapsamında hazırlanmış olup; RNA dizileme analizi çalışması için bir pilot projedir. Bu çalışmanın sonunda gen bölgelerine karşılık gelen RNA miktarları belirlenecektir. 
 
 ## Programların kurulumu
 
@@ -58,25 +59,49 @@ Bu çalışma aşağıdaki aşamalardan oluşmaktadır:
 
 # Bizim RNASeq analiz protokolümüz
 
+Öncelikle bu git deposunu klonlayın ve klasör içerisine girin:
+
+```bash
+git clone 
+cd rnaseq
+```
+
+Kullanacağımız ham DNA okumaları ve referans genom bilgileri `data` içerisinde yer almalıdır. İşlenmiş DNA okumaları, ve diğer çıktı dosyaları ise `results` klasörü içinde yer alacaktır.
+
+
+## DNA okumalarını indirme
+
+Bu çalışma kapsamında örnek bir veri seti oluşturulmuştur. Elde edilen DNA okumalarını Kırdök Lab Google Drive klasöründen indirebilirsiniz. Daha sonra `data/ref` isminde bir klasör oluşturun ve bu `fastq.gz` dosyalarını oluştruduğunuz klasör içerisinde kaydediniz:
+
+```bash
+mkdir -p data/raw
+```
+
 ## Kullanılacak Referans genomu indirme
 
-Referans genomu indirmek için aşağıdaki bağlantıları kullanabiliriz.
+Referans genomu indirmek için aşağıdaki bağlantıları kullanabiliriz. 
 
-+ https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4702867/
-
-+ https://www.ncbi.nlm.nih.gov/assembly/GCA_000007565.2
+Kullanılacak referans genom ve genom anotasyon dosyalarını aşağıdaki gibi indirebiliriz:
 
 Önce veri klasörlerimizi oluşturalım:
 
 ```bash
+
 mkdir -p data/ref
+cd data/ref
+
+wget https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/007/565/GCA_000007565.2_ASM756v2/GCA_000007565.2_ASM756v2_genomic.fna.gz
+
+gunzip GCA_000007565.2_ASM756v2_genomic.fna.gz
+
+wget https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/007/565/GCA_000007565.2_ASM756v2/GCA_000007565.2_ASM756v2_genomic.gff.gz
+
+gunzip GCA_000007565.2_ASM756v2_genomic.gff.gz
+
+cd ../..
 ```
 
-İstenilen referans genom fasta dosyası olarak, [şu bağlantıdan](https://www.ncbi.nlm.nih.gov/genome/?term=txid303[orgn]) indirilebilir.
-
-Bu sayfa içerisinde **Genome** bağlantısına tıklayarak dosyayı sıkıştırılmış halde indirebilirsiniz.
-
-İndirilen dosya, `Projects/rnaseq/data/ref` klasörü içerisine aktarılır ve ardından `gunzip` komutu ile bu sıkıştırılmış dosya açılır.  
+İndirdiğimiz referans genom dosyasını gunzip ile açmalıyız. Yoksa indeksleme işlemi düzgün bir şekilde gerçekleşmez.
 
 ## Yeni nesil dizileme verisi indirme ve kalite kontrol adımı
 
@@ -99,9 +124,11 @@ Bu adımı çalıştırmak için aşağıdaki komut yazılır:
 ./part1.sh
 ```
 
+`sra-tools` ile conda arasındakı uyumsuzluk nedeniyle, DNA okumlarının indirilmesi adımı şimdilik atlanmıştır.
+
 ## Fastq dosyalarının işleme adımı (Kısım 2)
 
-Bu adım için `part2.sh` betiğini kullanıyoruz. Bu betikte, ilk olarak `data` klasörü içerisinde işlenmiş fastq dosyaların kaydedileceği `processed` isimli bir klasör oluşturmalıyız. Bu klasör içerisinde de tek yönlü (se) ve çift yönlü (pe) okumaların olduğu iki farklı klasör oluşturmalıyız. 
+Bu adım için `part2.sh` betiğini kullanıyoruz. Bu betikte, ilk olarak `results` klasörü içerisinde işlenmiş fastq dosyaların kaydedileceği `processed` isimli bir klasör oluşturmalıyız. Bu klasör içerisinde de tek yönlü (se) ve çift yönlü (pe) okumaların olduğu iki farklı klasör oluşturmalıyız. 
 
 `Cutadapt` programı ile fastqc dosyalarının işleme adımları gerçekleştirilir. 
 
