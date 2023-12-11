@@ -1,0 +1,12 @@
+name: r
+channels:
+  - bioconda
+  - conda-forge
+dependencies:
+  - r-base
+  - bioconductor-biocinstaller
+  - bioconductor-rsamtools
+  - bioconductor-genomicalignments
+  - bioconductor-biocparallel
+  - bioconductor-genomicfeatures
+

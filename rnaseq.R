@@ -1,10 +1,15 @@
 library("Rsamtools")
+library("GenomicFeatures")
+library("GenomicAlignments")
+library("BiocParallel")
 
-filenames <- dir("results/alignment/", pattern = "sorted.bam", full.names = T, recursive = T)
+filenames <- dir("results/alignment/bwa", pattern = "sorted.bam", full.names = T, recursive = T)
+
+print(filenames)
 
 bamfiles <- BamFileList(filenames, yieldSize=2000000)
 
-library("GenomicFeatures")
+print(bamfiles)
 
 gtffile <- dir(".", pattern = "gtf", full.names = T)
 
@@ -12,11 +17,7 @@ txdb <-  makeTxDbFromGFF("https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/412/6
 
 ebg <- exonsBy(txdb, by="gene")
 
-library("GenomicAlignments")
-
-library("BiocParallel")
-
-register(MulticoreParam(2))
+#register(MulticoreParam(2))
 
 se <- summarizeOverlaps(features=ebg,
                         reads=bamfiles,
