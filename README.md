@@ -8,28 +8,7 @@ author: "Nursena Kocatürk"
 
 Bu döküman, tez kapsamında hazırlanmış olup; RNA dizileme analizi çalışması için bir pilot projedir. Bu çalışmanın sonunda gen bölgelerine karşılık gelen RNA miktarları belirlenecektir. 
 
-## Programların kurulumu
-
-Conda ile programları aşağıdaki gibi kurabilirsiniz.
-
-```bash
-conda env create --file envs/rnaseq.yaml
-```
-
-Daha sonra çevreyi aktive edin:
-
-```bash
-conda activate rnaseq
-```
-
-Eğer Conda çevrenizi güncellemek isterseniz:
-
-```bash
-conda env update --file envs/rnaseq.yaml
-
-```
-
-# Rnaseq
+# RNAseq
 
 RNA dizileme analizi, gen ekspresyon seviyelerinin analizinde kullanılan bir yöntemdir. 
 
@@ -37,7 +16,7 @@ RNA dizileme teknolojisi sayesinde transkriptomu oluşturan RNA dizilerinin hass
 
 Canlıdaki gen anlatımı tespit edilir ve başka örneklerle karşılaştırılır. 
 
-RNA Seq(RNA dizilimi), kodlama yapan ve kodlamayan RNA ekspresyonunu incelemek için kullanılan bir metodolojidir. Her aşamasında çeşitli yazılım araçları kullanılmaktadır. 
+RNA Seq (RNA dizilimi), kodlama yapan ve kodlamayan RNA ekspresyonunu incelemek için kullanılan bir metodolojidir. Her aşamasında çeşitli yazılım araçları kullanılmaktadır. 
 
 Bu çalışma aşağıdaki aşamalardan oluşmaktadır:
 
@@ -56,40 +35,114 @@ Bu çalışma aşağıdaki aşamalardan oluşmaktadır:
 
 + https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6066579/
 
+# Ön Hazırlık
 
-# Bizim RNASeq analiz protokolümüz
+## Git Deposunun Klonlanması
 
-Öncelikle bu git deposunu klonlayın ve klasör içerisine girin:
+Bu protokolde kullanılmak üzere hazırlanan dosyaları ve betikleri öncelikle kendi bilgisayarımıza almalıyız.
+
+1. Verilen linke gidiniz: https://github.com/nursenakocaturk/rnaseq
+2. Sayfada "<Code>" yazan kısma tıklayınız ve karşınıza çıkan https bağlantısını kopyalayınız
+3. Terminalinizde oluşturduğunuz proje klasörünün içerisine giriniz ve bu linki 
 
 ```bash
-git clone 
-cd rnaseq
+git clone https://github.com/nursenakocaturk/rnaseq
+```
+şeklinde terminale alınız.
+
+Kullanacağımız ham DNA okumaları ve referans genom bilgileri proje klasörü içerisindeki `data` içerisinde yer almalıdır. İşlenmiş DNA okumaları, ve diğer çıktı dosyaları ise yine proje klasörü içerisindeki `results` klasörü içinde yer alacaktır. Bunları protokolde ilerledikçe oluşturacağız. Biz hala proje klasörünün içerisindeyiz.
+
+## Conda Kurulumu ve Programların Aktifleştirilmesi
+
+Bu linkten işletim sisteminize uygun olan Conda programını (Miniconda kullanacağız) seçin:  https://docs.conda.io/projects/conda/en/stable/user-guide/install/download.html
+
+Programı seçtikten sonra indirme bağlantı linkini kopyalayın ve 
+
+```bash
+wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
+```
+gibi görünecek şekilde kodu yazın. Unutmayın, bu bir örnektir. Siz sizin kullandığınız işletim sistemine uygun olanı seçeceksiniz.
+
+Terminal üzerinde yüklemeyi yönlendirildiğiniz şekilde tamamlayın.
+
+Şimdi conda çevrelerini kurup aktive edeceğiz. Bu ççevrelerde, yapmak istediğimiz işe uygun olan paketler bir aradadır. Yapmak istediğimiz işe uygun olan çevrede işlerimizi yürütmeliyiz.
+
+RNAseq çevremizi kuralım;
+
+```bash
+conda env create --file envs/rnaseq.yaml
 ```
 
-Kullanacağımız ham DNA okumaları ve referans genom bilgileri `data` içerisinde yer almalıdır. İşlenmiş DNA okumaları, ve diğer çıktı dosyaları ise `results` klasörü içinde yer alacaktır.
+ve çevreyi aktive edelim:
 
+```bash
+conda activate rnaseq
+```
 
-## DNA okumalarını indirme
+Çevremizi aktive ettikten sonra komut satırımızın başında aktif olan çevrenin adı parantez içinde gösterilecektir.
 
-Bu çalışma kapsamında örnek bir veri seti oluşturulmuştur. Elde edilen DNA okumalarını Kırdök Lab Google Drive klasöründen indirebilirsiniz. Daha sonra `data/ref` isminde bir klasör oluşturun ve bu `fastq.gz` dosyalarını oluştruduğunuz klasör içerisinde kaydediniz:
+Eğer Conda çevrenizi güncellemek isterseniz:
+
+```bash
+conda env update --file envs/rnaseq.yaml
+```
+
+Protokolün ilerleyen aşamalarında R da kullanacağız. Şimdiden çevremizi kuralım:
+
+```bash
+conda env create --file envs/r.yaml
+```
+
+Zamanı geldiğinde aktive etmek için 
+
+```bash
+conda activate r
+```
+
+yazacağız. 
+
+Ama şu an için rnaseq çevresi içerisinde olmalıyız.
+
+## Referansların ve Okumaların Alınması
+
+Bu çalışma kapsamında örnek bir veri seti oluşturulmuştur. Klonladığımız klasörün içerisinde 'data_ena.txt' isimli metin dosyasının içerisinde raw/ham okumaların, bu okumalara ait bilgilerin ve indirme linklerinin bir listesi yer almaktadır. Yine bu klasörde 'data.txt' isimlii metin dosyasının içerisinde, bir öndeki metin dosyasından seçilmiş dört adet örnek yer almaktadır.
+
+Proje klasörümüzün içerisine ham okumaları ve referansımızı alacağımız iki ayrı klasör oluşturalım. 'raw' isimli klasörde ham okumalar, 'ref' isimli klasörümüzde ise referansımız olsun.
 
 ```bash
 mkdir -p data/raw
+mkdir -p data/ref
 ```
 
-## Kullanılacak Referans genomu indirme
+### Ham Okumaların Alınması
 
-Referans genomu indirmek için aşağıdaki bağlantıları kullanabiliriz. 
+Klasörlerimiz hazır, şimdi önce ham okumalarımızı alalım. Tüm ham okumaların yer aldığı listede hem çift yönlü, hem de tek yönlü okumalar yer almaktadır. Protokolün devamında bu iki okumalar da birbirlerinden farklı işleneceklerinden yine klasör bazında ayrımlarını yapmalıyız. Bu yüzden raw klasörünün içerisinde 'pe' ve 'se' isimli iki ayrı klasör oluşturun.
 
-Kullanılacak referans genom ve genom anotasyon dosyalarını aşağıdaki gibi indirebiliriz:
+'data.txt' dosyasını incelerseniz, seçilen okumaların hepsinin tek yönlü olduklarını göreceksiniz. 
 
-Önce veri klasörlerimizi oluşturalım:
+Tek yönlü okumaları alacağımız klasöre gidelim:
 
 ```bash
+cd data/raw/se
+```
 
-mkdir -p data/ref
+Ve 'data_ena.txt' dosyası içerisinden inceleyeceğimiz okumanın linkini kopyalayalım. Okumayı indirmek için kopyaladığımız linkle birlikte kodumuz şu şekilde görünecek şekilde düzenlenmelidir ('ftp://' ön takısını siz eklemelisiniz):
+
+```bash
+wget ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR702/005/SRR7029605/SRR7029605.fastq.gz
+```
+
+Diğer 3 okuma için de bu kodu oluşturup ayrı ayrı çalıştıralım. 'se' klasörünüzün içine okumalara ait toplamda 4 adet fastq.gz uzantılı dosya gelmiş olmalıdır.
+
+### Referansın alınması
+
+```bash
 cd data/ref
+```
+ ile referansımız için hazırladığımız klasöre girelim ve referans dosyalarını alıp gunzip komutu ile açalım.
 
+
+```bash
 wget https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/007/565/GCA_000007565.2_ASM756v2/GCA_000007565.2_ASM756v2_genomic.fna.gz
 
 gunzip GCA_000007565.2_ASM756v2_genomic.fna.gz
@@ -97,13 +150,11 @@ gunzip GCA_000007565.2_ASM756v2_genomic.fna.gz
 wget https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/007/565/GCA_000007565.2_ASM756v2/GCA_000007565.2_ASM756v2_genomic.gff.gz
 
 gunzip GCA_000007565.2_ASM756v2_genomic.gff.gz
-
-cd ../..
 ```
 
 İndirdiğimiz referans genom dosyasını gunzip ile açmalıyız. Yoksa indeksleme işlemi düzgün bir şekilde gerçekleşmez.
 
-## Yeni nesil dizileme verisi indirme ve kalite kontrol adımı
+# Kısım 1: Yeni Nesil Dizileme Verilerinin Kalite Kontrol Adımı
 
 Bu adım için `part1.sh` betiğini kullanıyoruz. Bu betik, ilk olarak `sra-tools` paketinde bulunan programları ile, istenen fastq dosyalarını indirerek, `fastqc` programı ile kalite kontrol adımlarını gerçekleştirir.
 
@@ -126,9 +177,9 @@ Bu adımı çalıştırmak için aşağıdaki komut yazılır:
 
 `sra-tools` ile conda arasındakı uyumsuzluk nedeniyle, DNA okumlarının indirilmesi adımı şimdilik atlanmıştır.
 
-## Fastq dosyalarının işleme adımı (Kısım 2)
+# Kısım 2: Fastq Dosyalarını İşleme Adımı
 
-Bu adım için `part2.sh` betiğini kullanıyoruz. Bu betikte, ilk olarak `results` klasörü içerisinde işlenmiş fastq dosyaların kaydedileceği `processed` isimli bir klasör oluşturmalıyız. Bu klasör içerisinde de tek yönlü (se) ve çift yönlü (pe) okumaların olduğu iki farklı klasör oluşturmalıyız. 
+Bu adım için `part2.sh` betiğini kullanıyoruz. Bu betikte, ilk olarak `results` klasörü içerisinde işlenmiş fastq dosyaların kaydedileceği `processed` isimli bir klasör oluşturmalıyız. Bu klasör içerisinde de tek yönlü 'se' ve çift yönlü 'pe' okumaların olduğu iki farklı klasör oluşturmalıyız. 
 
 `Cutadapt` programı ile fastqc dosyalarının işleme adımları gerçekleştirilir. 
 
@@ -136,11 +187,11 @@ Cutadapt, adaptör dizilerini, primerleri ve diğer istenmeyen dizileri yüksek 
 
 Cutadapt komutları `cutadapt_se.sh’`ve `cutadapt_pe.sh` betik dosyalarında yer alır.
 
-## Yeni nesil dizileme verilerinin referans genoma hizalanması
+# Kısım 3: İşlenmiş Yeni Nesil Dizileme Verilerinin Referans Genoma Hizalanması
 
-### BWA ile hizalama
+## BWA ile hizalama
 
-Bu adım için `part3.sh` betiğini kullanıyoruz. Bu betikte, ilk olarak elde edilen çıktıların kaydedilmesi için `results` klasörü altında `aligment` klasörünü oluşturmalıyız. Bu klasör içerisinde de tek yönlü (se) ve çift yönlü (pe) okumaların olduğu iki farklı klasör oluşturulur.
+Bu adım için `part3.sh` betiğini kullanıyoruz. Bu sefer çıktıların alınacağı dosyalar betik içerisindeki kod ile oluşturulacaktır. Bizim önden manuel olarak hazırlamamıza gerek yoktur. 
 
 `BWA` programı ile yeni nesil dizileme verilerinin referans genoma hizalanma adımı gerçekleştirilir.
 
@@ -150,11 +201,7 @@ Bu, RNA-seq okumalarını referans genoma hizalayacak ve hizalamaları bir SAM d
 
 Bwa komutları `bwa_se.sh`ve `bwa_pe.sh` betik dosyalarında yer alır.
 
-Hizalamaları daha fazla işlemek ve analiz etmek için `Samtools` gibi araçlar kullanılır.
-
-Sonraki adımda ise `bcftools` programı kullanılarak varyant çağırma işlemi gerçekleştirilir.
-
-### STAR ile hizalama
+## STAR ile hizalama
 
 Bu adım için `part4.sh` betiğini kullanıyoruz. Bu betikte, ilk olarak elde edilen çıktıların kaydedilmesi için `results` klasörü altında `star` klasörünü oluşturmalıyız. Bu klasör içerisinde de tek yönlü (se) ve çift yönlü (pe) okumaların olduğu iki farklı klasör oluşturulur.
 
@@ -166,13 +213,13 @@ Genel olarak, BWA ve STAR arasındaki seçim, sıralama verilerinin türüne ve 
 
 STAR komutları `star_se.sh`ve `star_pe.sh` betik dosyalarında yer alır.
 
-#### `gff` Dosyası İndirme
+### `gff` Dosyası İndirme
 
 İstenilen `gff` dosyası, [şu bağlantıdan](https://www.ncbi.nlm.nih.gov/genome/?term=txid303[orgn]) indirilir.
 
 Bu sayfa içerisinde **GFF** bağlantısına tıklayarak dosyayı indirebilirsiniz.
 
-#### Cufflinks 
+### Cufflinks 
 
 Conda ile `cufflinks` programını aşağıdaki gibi kurabilirsiniz.
 
@@ -222,25 +269,25 @@ STAR --runThreadN 4 \
 	--readFilesCommand zcat
 ```
 
-#### STAR aracı çıktıları
+### STAR aracı çıktıları
 
-##### Log.out
+#### Log.out
 
 Çalıştırma hakkında birçok ayrıntılı bilgi içeren dosya. Bu dosya en çok sorun giderme ve hata ayıklama için kullanışlıdır.
 
-##### Log.progress.out
+#### Log.progress.out
 
 İşlenen okuma sayısı, eşlenen okumaların vb. gibi iş ilerleme istatistiklerini raporlar. 
 
-##### Log.final.out
+#### Log.final.out
 
 Haritalama işi tamamlandıktan sonra özet haritalama istatistikleri, kalite kontrolü için çok faydalıdır. İstatistikler her okuma için (tek veya çift uç) hesaplanır ve ardından tüm okumalar üzerinden toplanır veya ortalaması alınır. 
 
-##### Aligned.out.sam
+#### Aligned.out.sam
 
 Standart SAM biçimindeki hizalamalar.
 
-##### SJ.out.tab
+#### SJ.out.tab
 
 Sekmeyle ayrılmış formatta yüksek güvenliğe sahip daraltılmış ekleme bağlantılarını içerir. STAR'ın bağlantı noktası başlangıcını/bitişini intronik bazlar olarak tanımlarken, diğer birçok yazılımın bunları eksonik bazlar olarak tanımladığını unutmayın. Sütunlar şu anlama gelir:
 
@@ -254,19 +301,19 @@ Sekmeyle ayrılmış formatta yüksek güvenliğe sahip daraltılmış ekleme ba
 + Sütun 8: bağlantı noktasından geçen çoklu eşleme okuma sayısı
 + Sütun 9: maksimum eklenmiş hizalama çıkıntısı
 
-### Genom Tarayıcısı
+## Genom Tarayıcısı
 
 Hizalama adımından sonra genom tarayıcısı adımı yer almaktadır. Okuma hizalamaları (BAM, SAM formatlarında), kullanıcıların bir grafik arayüz kullanarak genomik dizilere ve ek açıklama verilerine göz atmasına, bunları aramasına, almasına ve analiz etmesine olanak tanıyan bir program olan bir genom tarayıcısında görüntülenebilir.
 
 İki tür genom tarayıcısı vardır:
 
-#### Web tabanlı genom tarayıcıları:
+### Web tabanlı genom tarayıcıları:
 
 + UCSC Genom Tarayıcısı
 + Ensembl Genom Tarayıcısı
 + NCBI Genom Veri Görüntüleyici
 
-#### Masaüstü uygulamaları (bazıları web tabanlı bir genom tarayıcısı oluşturmak için de kullanılabilir):
+### Masaüstü uygulamaları (bazıları web tabanlı bir genom tarayıcısı oluşturmak için de kullanılabilir):
 
 + JBrowse
 + GBrowse
