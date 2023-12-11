@@ -42,7 +42,7 @@ Bu çalışma aşağıdaki aşamalardan oluşmaktadır:
 Bu protokolde kullanılmak üzere hazırlanan dosyaları ve betikleri öncelikle kendi bilgisayarımıza almalıyız.
 
 1. Verilen linke gidiniz: https://github.com/nursenakocaturk/rnaseq
-2. Sayfada "Code" yazan şekil kutucuğa tıklayınız ve karşınıza çıkan https bağlantısını kopyalayınız
+2. Sayfada "Code" yazan yeşil kutucuğa tıklayınız ve karşınıza çıkan https bağlantısını kopyalayınız
 3. Terminalinizde oluşturduğunuz proje klasörünün içerisine giriniz ve bu linki 
 
 ```bash
