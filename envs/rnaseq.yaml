@@ -1,15 +1,11 @@
 name: rnaseq
 channels:
-        - bioconda
+  - bioconda
 dependencies:
-        - sra-tools
-        - fastqc
-        - cutadapt
-        - star
-        - bwa
-        - samtools
-        - r
-        - bioconductor-rsamtools 
-        - bioconductor-genomicalignments 
-        - bioconductor-biocparallel
-        - bioconductor-genomicfeatures
+  - fastqc
+  - cutadapt
+  - star
+  - bwa
+  - samtools
+  - bowtie2
+  - trimmomatic
