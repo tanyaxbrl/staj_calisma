@@ -20,4 +20,4 @@ samtools sort results/alignment/bwa/${SRR}.bam -o results/alignment/bwa/${SRR}.s
 
 samtools index results/alignment/bwa/${SRR}.sorted.bam
 
-rm results/aligment/bwa/${SRR}_p.sai
+rm results/alignment/bwa/${SRR}_p.sai
