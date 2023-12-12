@@ -9,7 +9,7 @@ OUT=results/alignment/bowtie2
 
 echo "aligning ${SRR}"
 
-bowtie2-align-s -x data/ref/${FASTA} -p 4 -U results/processed/${END}/${SRR}.fastq.gz |  samtools view -F3 -q30 -Sb > ${OUT}/${SRR}.bam
+bowtie2-align-s -x data/ref/${FASTA} -p 4 -U results/processed/${END}/${SRR}.fastq.gz |  samtools view -F4 -q30 -Sb > ${OUT}/${SRR}.bam
 
 samtools sort ${OUT}/${SRR}.bam -o ${OUT}/${SRR}.sorted.bam
 
