@@ -15,4 +15,4 @@ do
 		fastqc data/raw/${END}/${SRR}.fastq.gz
 	fi
 
-done < data.txt 
+done < $1

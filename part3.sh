@@ -18,5 +18,5 @@ do
             ./scripts/bwa_se.sh ${SRR} ${END} ${REFERENCE}
         fi
 
-done < data.txt
+done < $1
 

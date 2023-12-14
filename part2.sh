@@ -20,5 +20,5 @@ do
 		./scripts/cutadapt_se.sh ${SRR} ${END}
 	fi
 
-done < data.txt 
+done < $1 
 
