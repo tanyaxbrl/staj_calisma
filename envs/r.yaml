@@ -9,4 +9,4 @@ dependencies:
   - bioconductor-genomicalignments
   - bioconductor-biocparallel
   - bioconductor-genomicfeatures
-
+  - subread
