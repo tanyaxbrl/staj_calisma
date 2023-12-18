@@ -52,7 +52,7 @@ git clone https://github.com/nursenakocaturk/rnaseq
 
 Kullanacağımız ham DNA okumaları ve referans genom bilgileri proje klasörü içerisindeki `data` içerisinde yer almalıdır. İşlenmiş DNA okumaları, ve diğer çıktı dosyaları ise yine proje klasörü içerisindeki `results` klasörü içinde yer alacaktır. Bunları protokolde ilerledikçe oluşturacağız. Biz hala proje klasörünün içerisindeyiz.
 
-## Conda Kurulumu ve Programların Aktifleştirilmesi
+## Conda Kurulumu ve Programların Aktifleştirilmesi (Eğer sisteminizde conda kurulu değilse)
 
 Bu linkten işletim sisteminize uygun olan Conda programını (Miniconda kullanacağız) seçin:  https://docs.conda.io/projects/conda/en/stable/user-guide/install/download.html
 
@@ -150,6 +150,11 @@ gunzip GCA_000007565.2_ASM756v2_genomic.fna.gz
 wget https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/007/565/GCA_000007565.2_ASM756v2/GCA_000007565.2_ASM756v2_genomic.gff.gz
 
 gunzip GCA_000007565.2_ASM756v2_genomic.gff.gz
+
+wget https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/007/565/GCA_000007565.2_ASM756v2/GCA_000007565.2_ASM756v2_genomic.gtf.gz
+
+
+gunzip GCA_000007565.2_ASM756v2_genomic.gtf.gz
 ```
 
 İndirdiğimiz referans genom dosyasını gunzip ile açmalıyız. Yoksa indeksleme işlemi düzgün bir şekilde gerçekleşmez.
@@ -172,7 +177,7 @@ ERR10671865 pe
 Bu adımı çalıştırmak için aşağıdaki komut yazılır:
 
 ```bash
-./part1.sh
+./part1.sh data.txt
 ```
 
 `sra-tools` ile conda arasındakı uyumsuzluk nedeniyle, DNA okumlarının indirilmesi adımı şimdilik atlanmıştır.
@@ -187,7 +192,11 @@ Cutadapt, adaptör dizilerini, primerleri ve diğer istenmeyen dizileri yüksek 
 
 Cutadapt komutları `cutadapt_se.sh’`ve `cutadapt_pe.sh` betik dosyalarında yer alır.
 
-# Kısım 3: İşlenmiş Yeni Nesil Dizileme Verilerinin Referans Genoma Hizalanması
+```bash
+./part2.sh data.txt
+```
+
+# Kısım 3 ve 4: İşlenmiş Yeni Nesil Dizileme Verilerinin Referans Genoma Hizalanması
 
 ## BWA ile hizalama
 
@@ -201,8 +210,31 @@ Bu, RNA-seq okumalarını referans genoma hizalayacak ve hizalamaları bir SAM d
 
 Bwa komutları `bwa_se.sh`ve `bwa_pe.sh` betik dosyalarında yer alır.
 
-## STAR ile hizalama
+```bash
+./part3.sh data.txt
+```
 
+## Bowtie2 ile hizalama
+
+Bowtie2 da yine okumaları referans genoma hizalayan bir araçtır.
+
+```bash
+./part4.sh data.txt
+```
+Komutuyla bu programı çalıştıralım.
+
+# Kısım 5: Hizalanan Verilerle Sayı Matrisi Oluşturulması
+
+Bu adımda `part-count.sh` betiğini kullanacağız. Bu betikle hizalama sonrası elde eedilen verilen, artık gen ifadesi düzeyinde gerçekleştirecek olduğumuz analizlerin baş rolü olan gen ifadesi matrisleri oluşturulacaktır. Artık bu aşamada R çevresini aktive etmeliyiz. 
+
+```bash
+./part-count.sh
+```
+betiği ile bu programı çalıştıralım.
+
+# Bonus: STAR ile hizalama
+
+STAR programı çoğunlukla ökaryotik gen ifadelerinin analizlerinde kullanılan bir araçtır.
 Bu adım için `part4.sh` betiğini kullanıyoruz. Bu betikte, ilk olarak elde edilen çıktıların kaydedilmesi için `results` klasörü altında `star` klasörünü oluşturmalıyız. Bu klasör içerisinde de tek yönlü (se) ve çift yönlü (pe) okumaların olduğu iki farklı klasör oluşturulur.
 
 STAR, BWA aracı gibi DNA dizilerini referans genoma hizalamak için kullanılan bir araçtır. Özelliklerinde ve uygulamalarında bazı farklılıklar vardır.
@@ -320,3 +352,5 @@ Hizalama adımından sonra genom tarayıcısı adımı yer almaktadır. Okuma hi
 + IGV
 
 Küçük boyutlu veriler doğrudan genom tarayıcısına yüklenebilirken, büyük dosyalar normalde tarayıcı tarafından erişilebilen bir web sunucusuna yerleştirilir. STAR eşleyici tarafından üretilen BAM dosyalarını keşfetmek için öncelikle dosyaları sıralamamız ve indekslememiz gerekir. Bizim durumumuzda, sıralama zaten STAR tarafından yapılmıştır çünkü hizalamaları koordinatlara göre sıralanmış BAM dosyalarına veririz. 
+
+
