@@ -1,0 +1,63 @@
+---
+title: "Differential_expression_analysis"
+author: "Tanya Beril Korkmaz"
+date: '2023-12-19'
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library("DESeq2")
+library(ggplot2)
+```
+
+```{r}
+metadata <- read.table(file = "data_ozlem_k.txt", sep = " ")
+colnames(metadata) <- c("sample", "layout", "condition")
+tool <- "bowtie2"
+```
+
+
+```{r}
+count_matrix <- read.table(file = paste0("results/counts/counts-", metadata$sample[1],"-", tool, ".txt"), header=T)
+count_matrix <- count_matrix[ ,c(1,7)]
+rownames(count_matrix) <- count_matrix$Geneid
+count_matrix$Geneid <- NULL
+colnames(count_matrix) <- metadata$sample[1]
+  
+for (i in 2:nrow(metadata)){
+  data <- read.table(file = paste0("results/counts/counts-", metadata$sample[i],"-", tool, ".txt"), header=T)
+  data <- data[ ,c(1,7)]
+  rownames(data) <- data$Geneid
+  data$Geneid <- NULL
+  colnames(data) <- metadata$sample[i]
+  count_matrix <- merge(x = count_matrix ,y = data, by = 'row.names')
+  rownames(count_matrix) <- count_matrix$Row.names
+  count_matrix$Row.names <- NULL
+}
+
+```
+
+```{r}
+dds <- DESeqDataSetFromMatrix(countData = count_matrix, colData = metadata, design=~condition)
+dds <- DESeq(dds)
+res <- results(dds)
+res <- res[order(res$padj),]
+```
+
+
+
+```{r}
+maxFold<-max(res$log2FoldChange[!is.na(res$log2FoldChange)])
+minFold<-min(res$log2FoldChange[!is.na(res$log2FoldChange)])
+
+par(mfrow=c(1,1))
+with(res, plot(log2FoldChange, -log10(pvalue), pch=20, main="Volcano plot", xlim=c(minFold, maxFold)))
+with(subset(res, padj<.01), points(log2FoldChange, -log10(pvalue), pch=20, col="blue"))
+with(subset(res, padj<.01 & abs(log2FoldChange)>2), points(log2FoldChange, -log10(pvalue), pch=20, col="orange"))
+
+```
+
