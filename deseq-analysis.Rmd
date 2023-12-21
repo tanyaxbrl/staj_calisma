@@ -1,5 +1,5 @@
 ---
-title: "Differential_expression_analysis"
+title: "Differential Expression Analysis"
 author: "Tanya Beril Korkmaz"
 date: '2023-12-19'
 output: html_document
@@ -9,7 +9,7 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-```{r}
+```{r warning=FALSE} 
 library("DESeq2")
 library("pheatmap")
 library(ggplot2)
@@ -56,19 +56,30 @@ res <- res[order(res$padj),]
 ```
 
 ```{r}
-plot(hclust(dist(x = t(cntmatrix))))
+distance <- dist(x = t(cntmatrix))
+plot(hclust(distance))
 ```
 
 
 ```{r}
-pca<-prcomp(x = t(cntmatrix))
+pca <- prcomp(x = t(cntmatrix))
+pca_dist <- prcomp(x = distance)
 
 d <- as.data.frame(pca$x)
 d$condition <- metadata$condition
+d$sample <- rownames(d)
 
-ggplot(d, aes(x=PC1, y=PC2, color=condition)) + geom_point()
+ggplot(d, aes(x=PC1, y=PC2, color=condition)) + geom_point() + geom_text(aes(label = sample))
 ```
 
+```{r}
+
+d <- as.data.frame(pca_dist$x)
+d$condition <- metadata$condition
+d$sample <- rownames(d)
+
+ggplot(d, aes(x=PC1, y=PC2, color=condition)) + geom_point() + geom_text(aes(label = sample))
+```
 
 ```{r}
 maxFold<-max(res$log2FoldChange[!is.na(res$log2FoldChange)])
@@ -84,6 +95,7 @@ with(subset(res, padj<.01 & abs(log2FoldChange)>2), points(log2FoldChange, -log1
 
 ```{r}
 result <- data.frame(GeneID = rownames(res),BaseMean=res$baseMean, FoldChange=res$log2FoldChange, Padj=res$padj)
+write.table(file="full_results.csv", x = result,  sep = ";", quote = FALSE, row.names = FALSE, dec = "," )
 
 ```
 
