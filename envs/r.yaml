@@ -13,4 +13,5 @@ dependencies:
   - bioconductor-ggplot2
   - bioconductor-pheatmap
   - r-kableExtra
+  - r-ggrepel
   - subread
