@@ -1,19 +1,24 @@
 ---
-title: "Differential_expression_analysis"
+title: "Differential Expression Analysis"
 author: "Tanya Beril Korkmaz"
-date: '2023-12-19'
+date: "2023-12-19"
 output: html_document
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
 ```
+
+Öncelikle kullanacağımız kütüphaneleri yüklememiz gerekli. Özellikle `DESeq2` kütüphanesini Bioconductor platformu üzerinden yüklemeniz tavsiye edilir.
 
 ```{r}
 library("DESeq2")
 library("pheatmap")
-library(ggplot2)
+library("ggplot2")
+library("kableExtra")
 ```
+
+Örneklerimizin sahip oldukları metadata bilgilerini yükleyelim. 
 
 ```{r}
 metadata <- read.table(file = "data_ozlem_k.txt", sep = " ")
@@ -21,16 +26,29 @@ colnames(metadata) <- c("sample", "layout", "condition")
 tool <- "bowtie2"
 ```
 
+Aşağıdaki tabloda çalıştığımız örnekler hakkındaki metaveri bilgisi bulunmaktadır:
 
 ```{r}
-count_matrix <- read.table(file = paste0("results/counts/counts-", metadata$sample[1],"-", tool, ".txt"), header=T)
+kable(metadata)
+```
+
+Her örneğe ait gen anlatım matrislerini alarak, tek bir matriste birleştirelim:
+
+```{r}
+count_matrix <- read.table(file = paste0("results/counts/counts-", 
+                                         metadata$sample[1],"-", 
+                                         tool, 
+                                         ".txt"), header=T)
 count_matrix <- count_matrix[ ,c(1,7)]
 rownames(count_matrix) <- count_matrix$Geneid
 count_matrix$Geneid <- NULL
 colnames(count_matrix) <- metadata$sample[1]
   
 for (i in 2:nrow(metadata)){
-  data <- read.table(file = paste0("results/counts/counts-", metadata$sample[i],"-", tool, ".txt"), header=T)
+  data <- read.table(file = paste0("results/counts/counts-", 
+                                   metadata$sample[i],"-", 
+                                   tool, 
+                                   ".txt"), header=T)
   data <- data[ ,c(1,7)]
   rownames(data) <- data$Geneid
   data$Geneid <- NULL
@@ -42,15 +60,31 @@ for (i in 2:nrow(metadata)){
 
 ```
 
+Şimdi de elimizdeki sayı matirisinin boyutlarına bakalım:
+
 ```{r}
-dds <- DESeqDataSetFromMatrix(countData = count_matrix, colData = metadata, design=~condition)
+dim(count_matrix)
+```
+
+Şimdi de, elimizdeki matrisi `DESeq2` objesi haline getirelim. Bunun için `count_matrix` ve `metadata` verilerini birleştireceğiz.
+
+```{r}
+dds <- DESeqDataSetFromMatrix(countData = count_matrix, 
+                              colData = metadata, 
+                              design=~condition)
 dds <- DESeq(dds)
+```
 
+Sonraki aşamada
+
+```{r}
 # consider removing low abundant genes
-#keep <- sum(rowSums(counts(dds)) >= 10)
-#dds <- dds[keep,]
+keep <- rowMeans(counts(dds)) >= 10
+deleted <- rowMeans(counts(dds)) < 10
 
-cntmatrix <- counts(dds)
+dds <- dds[keep,]
+
+cntmatrix <- counts(dds, normalized=T)
 res <- results(dds)
 res <- res[order(res$padj),]
 ```
@@ -83,7 +117,7 @@ with(subset(res, padj<.01 & abs(log2FoldChange)>2), points(log2FoldChange, -log1
 
 
 ```{r}
-result <- data.frame(GeneID = rownames(res),BaseMean=res$baseMean, FoldChange=res$log2FoldChange, Padj=res$padj)
+result <- data.frame(GeneID = rownames(res),BaseMean=res$baseMean, FoldChange=res$log2FoldChange, Padj=res$padj, P=res$pvalue)
 
 ```
 
