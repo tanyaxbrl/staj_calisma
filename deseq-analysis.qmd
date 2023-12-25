@@ -1,0 +1,211 @@
+---
+title: "Differential Expression Analysis"
+author: "Tanya Beril Korkmaz, Nursena Kocatürk, Emrah Kırdök"
+date: "2023-12-24"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
+```
+
+Öncelikle kullanacağımız kütüphaneleri yüklememiz gerekli. Özellikle `DESeq2` kütüphanesini Bioconductor platformu üzerinden yüklemeniz tavsiye edilir.
+
+```{r}
+library("DESeq2")
+library("pheatmap")
+library("ggplot2")
+library("kableExtra")
+library("ggrepel")
+```
+
+Örneklerimizin sahip oldukları metadata bilgilerini yükleyelim. 
+
+```{r}
+metadata <- read.table(file = "data_ozlem_k.txt", sep = " ")
+colnames(metadata) <- c("sample", "layout", "condition")
+tool <- "bowtie2"
+```
+
+Aşağıdaki tabloda çalıştığımız örnekler hakkındaki metaveri bilgisi bulunmaktadır:
+
+```{r}
+kable(metadata)
+```
+
+Her örneğe ait gen anlatım matrislerini alarak, tek bir matriste birleştirelim:
+
+```{r}
+count_matrix <- read.table(file = paste0("results/counts/counts-", 
+                                         metadata$sample[1],"-", 
+                                         tool, 
+                                         ".txt"), header=T)
+count_matrix <- count_matrix[ ,c(1,7)]
+rownames(count_matrix) <- count_matrix$Geneid
+count_matrix$Geneid <- NULL
+colnames(count_matrix) <- metadata$sample[1]
+  
+for (i in 2:nrow(metadata)){
+  data <- read.table(file = paste0("results/counts/counts-", 
+                                   metadata$sample[i],"-", 
+                                   tool, 
+                                   ".txt"), header=T)
+  data <- data[ ,c(1,7)]
+  rownames(data) <- data$Geneid
+  data$Geneid <- NULL
+  colnames(data) <- metadata$sample[i]
+  count_matrix <- merge(x = count_matrix ,y = data, by = 'row.names')
+  rownames(count_matrix) <- count_matrix$Row.names
+  count_matrix$Row.names <- NULL
+}
+
+```
+
+Şimdi de elimizdeki sayı matirisinin boyutlarına bakalım:
+
+```{r}
+dim(count_matrix)
+```
+
+Şimdi de, elimizdeki matrisi `DESeq2` objesi haline getirelim. Bunun için `count_matrix` ve `metadata` verilerini birleştireceğiz.
+
+```{r}
+dds <- DESeqDataSetFromMatrix(countData = count_matrix, 
+                              colData = metadata, 
+                              design=~condition)
+```
+
+Sonraki aşamada ise düşük anlatıma sahip olan genleri belirleyelim. Bu aşama için tam bir değer aslında yok. Bir genin bütün örneklerdeki anlatımının, ortalaması 10'un altındaysa, bu gen düşük anlatıma sahip bir gen olarak kabul edilebilir.
+
+```{r}
+# consider removing low abundant genes
+keep <- rowMeans(counts(dds)) >= 10
+deleted <- rowMeans(counts(dds)) < 10
+```
+
+Yaptığımız analize göre, anlatımı çok düşük olan `r length(deleted)` tane gen bulunmaktadır. Bu genler aslında hiç anlatımı olmayan genlere karşılık gelebilirler.
+
+Şimdi bu genler alıp bir dosyaya yazalım.
+
+```{r}
+write.csv2(file = "non-expressed-genes.csv", x = count_matrix[deleted,])
+```
+
+Şimdi, düşük anlatıma sahip genleri analizlerimizden çıkartalım ve normalize edilmiş RNA sayı matrisini elde edelim ve karşılaştırmalı gen anlatım analizlerini gerçekleştirelim:
+
+```{r}
+dds <- dds[keep,]
+dds <- DESeq(dds)
+```
+
+Şimdi de normalize edilmiş gen anlatım matrisini alalım.
+
+```{r}
+count_matrix_normalized <- counts(dds, normalized=T)
+```
+
+Kümeleme analizi ile verimizin nasıl gruplandığını inceleyelim:
+
+```{r}
+plot(hclust(dist(x = t(count_matrix_normalized))))
+```
+
+Şimdi de PCA ile bir analiz gerçekleştirelim.
+
+```{r}
+pca<-prcomp(x = t(count_matrix_normalized))
+
+d <- as.data.frame(pca$x)
+d$condition <- metadata$condition
+d$sample <- metadata$sample
+
+ggplot(d, aes(x=PC1, y=PC2, color=condition)) + 
+  geom_point() + 
+  geom_text_repel(aes(label = sample)) + 
+  theme_bw()
+```
+
+Artık karşılaştırmalı gen anlatım analizlerine başlayabiliriz. Bunu `DESeq` fonksiyonu ile gerçekleştiriyoruz.
+
+```{r}
+res <- results(dds)
+res <- res[order(res$padj),]
+```
+
+Elimizdeki sonucu bir veri çerçevesine aktaralım:
+
+```{r}
+result <- data.frame(GeneID = rownames(res),
+  BaseMean=res$baseMean, 
+  FoldChange=res$log2FoldChange, 
+  Padj=res$padj)
+
+```
+
+Benjamini-Hochberg düzletmesine gore, 0.001'e göre anlamı olarak değişen kaç gen var? Burada `Padj` sütununu incelememiz gereklidir.
+
+```{r}
+sum(result$Padj<0.001, na.rm = T)
+```
+
+Ancak bazı genlerin anlamlılık seviyesi `NA` olabilir. Bu, ya o genlerin çok düşük anlatım seviyelerine sahip olduklarını gösteren bir şey olabilir, ya da o genlerde beklenen dağılım dışında davranan genlerin varlığı yüzünden olabilir.
+
+Kaç tane böyle gen var acaba?
+
+```{r}
+outliers <- count_matrix[result[is.na(result$Padj),]$GeneID,]
+nrow(outliers)
+```
+
+Bu genleri bir veri çerçevesi olarak kaydedelim:
+
+```{r}
+write.csv2(file = "outlier-genes.csv", x = outliers)
+```
+
+Şimdi de bir kutu grafiği ile görselleştrelim:
+
+```{r}
+boxplot(t(outliers))
+```
+
+Son olarak Volcano plot ile anlamlı olarak değişen genleri inceleyelim:
+
+```{r}
+maxFold<-max(res$log2FoldChange[!is.na(res$log2FoldChange)])
+minFold<-min(res$log2FoldChange[!is.na(res$log2FoldChange)])
+
+par(mfrow=c(1,1))
+with(res, plot(log2FoldChange, -log10(pvalue), pch=20, main="Volcano plot", xlim=c(minFold, maxFold)))
+with(subset(res, padj<.01), points(log2FoldChange, -log10(pvalue), pch=20, col="blue"))
+with(subset(res, padj<.01 & abs(log2FoldChange)>2), points(log2FoldChange, -log10(pvalue), pch=20, col="orange"))
+
+```
+
+Şimdi de 0.001'e göre 5 kat fazla artan ya da 5 kattan fazla azalan genleri belileyip hem bir heatmap yapalım hem de bu genleri yazalım:
+
+```{r}
+ups <- subset(x = result, subset = FoldChange > 5 & Padj < 0.001)
+downs <- subset(x = result, subset = FoldChange < -5 & Padj < 0.001)
+m <- rbind(ups,downs)
+rownames(m)<-m$GeneID
+```
+
+Bu genlerin sahip olduğu normalize edilmiş anlatım verilerini, ısı haritası ile görselleştirmek için, normalize edilmiş matris içinden elde edelim. Daha sonra `log2` fonkisyonu ile 2'nin katlarına transforme edelim.
+
+Burada dikkat edilmesi gereken şey ise $log2(0) = -Inf$ olması. Bu yüzden $-Inf$ değerlerini, 0 olarak düzeltmemiz gerek. Bu sayede anlatımı 0 olan genleri de ısı matrisinde gösterebiliriz:
+
+```{r}
+sig <- count_matrix_normalized[m$GeneID,]
+logsig <- log2(sig)
+logsig[logsig == -Inf]<-0
+```
+
+Son olarakısı haritasını elde edelim ve bu genleri kaydedelim.
+
+```{r}
+pheatmap(mat = logsig, fontsize_row = 3)
+
+write.table(file = "significant_genes.csv", sep = ";", quote = FALSE, x = m, dec = ",")
+```
+
