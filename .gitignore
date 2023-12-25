@@ -5,6 +5,12 @@ results/
 *fastq.gz
 *gtf
 *gff 
+*csv
+*pdf
+*html
+*_files
+*Rhistory
+*RData
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

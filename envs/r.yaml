@@ -9,4 +9,9 @@ dependencies:
   - bioconductor-genomicalignments
   - bioconductor-biocparallel
   - bioconductor-genomicfeatures
+  - bioconductor-deseq2
+  - bioconductor-ggplot2
+  - bioconductor-pheatmap
+  - r-kableExtra
+  - r-ggrepel
   - subread
