@@ -1,26 +1,20 @@
 #!/bin/bash
 
-#htseq_count [options] alignment_files gff_file 
-#or
-#phyton -m HTSeq.scripts.count [options] alignment_files gff_file
-
-
-
-
-TOOL = $2
+#htseq_count [options] alignment_files gff_file or phyton -m HTSeq.scripts.count [options] alignment_files gff_file
+TOOL=$2
 
 while read LINE
-SRR = $(echo "$LINE" | cut -d " " -f1}
-END = $(echo "$LINE" | cut -d " " -f2}
+do
+	SRR=$(echo "$LINE" | cut -d " " -f1)
+	END=$(echo "$LINE" | cut -d " " -f2)
 
-if [${END} == "pe"]
-then
-phyton -m HTSeq.scripts.count [-f sorted.bam -r ${SRR}_1 ${SRR}_2 -o results/counts/counts-${SRR}-${TOOL}_pe.txt] \ 
-results/alignment/bowtie2/${TOOL}/${SRR}_pe.sorted.bam data/ref/*.gff
-
-else
-phyton -m HTSeq.scripts.count [-f sorted.bam -o results/counts/counts-${SRR}-${TOOL}_se.txt] \ 
-results/alignment/bowtie2/${TOOL}/${SRR}_se.sorted.bam data/ref/*.gff  
-
+	if [ ${END} == "pe" ]
+	then
+		htseq-count -r -c results/counts/counts-${SRR}-${TOOL}_pe.txt -t exon results/alignment/${TOOL}/${SRR}.bam data/ref/GCA_000007565.2_ASM756v2_genomic.gtf
+	#phyton -m HTSeq.scripts.count -r -c results/counts/counts-${SRR}-${TOOL}_pe.txt results/alignment/bowtie2/${TOOL}/${SRR}.bam data/ref/GCA_000007565.2_ASM756v2_genomic.gtf
+	else
+		htseq-count -c results/counts/counts-${SRR}-${TOOL}_se.txt -t exon results/alignment/${TOOL}/${SRR}.bam data/ref/GCA_000007565.2_ASM756v2_genomic.gtf
+	#phyton -m HTSeq.scripts.count -c results/counts/counts-${SRR}-${TOOL}_se.txt results/alignment/bowtie2/${TOOL}/${SRR}.bam data/ref/GCA_000007565.2_ASM756v2_genomic.gtf
 fi
+
 done < $1
