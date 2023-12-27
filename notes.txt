@@ -1,0 +1,23 @@
+27/12/2023 tool notlari
+
+HTseq base'e kuruldu
+
+HTseq installation:
+pip install HTSeq
+
+HTSeq env:
+vim envs/htseq.yaml
+ channels
+ - bioconda
+ dependencies
+ - htseq=2.0.4
+
+conda env create --file envs/htseq.yaml
+
+hata raporu:
+Format not recognized for output count file: txt
+  [Exception type: ValueError, raised in utils.py:371]
+
+Calistirabildigimiz kod buydu:
+htseq-count results/alignment/bowtie2/SRR7029605.sorted.bam data/ref/GCA_000007565.2_ASM756v2_genomic.gtf -t exon -o test.txt
+

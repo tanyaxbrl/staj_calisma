@@ -1,0 +1,114 @@
+---
+title: "Differential Expression Analysis"
+author: "Tanya Beril Korkmaz"
+date: '2023-12-19'
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r warning=FALSE} 
+library("DESeq2")
+library("pheatmap")
+library(ggplot2)
+```
+
+```{r}
+metadata <- read.table(file = "data_ozlem_k.txt", sep = " ")
+colnames(metadata) <- c("sample", "layout", "condition")
+tool <- "bowtie2"
+```
+
+
+```{r}
+count_matrix <- read.table(file = paste0("results/counts/counts-", metadata$sample[1],"-", tool, ".txt"), header=T)
+count_matrix <- count_matrix[ ,c(1,7)]
+rownames(count_matrix) <- count_matrix$Geneid
+count_matrix$Geneid <- NULL
+colnames(count_matrix) <- metadata$sample[1]
+  
+for (i in 2:nrow(metadata)){
+  data <- read.table(file = paste0("results/counts/counts-", metadata$sample[i],"-", tool, ".txt"), header=T)
+  data <- data[ ,c(1,7)]
+  rownames(data) <- data$Geneid
+  data$Geneid <- NULL
+  colnames(data) <- metadata$sample[i]
+  count_matrix <- merge(x = count_matrix ,y = data, by = 'row.names')
+  rownames(count_matrix) <- count_matrix$Row.names
+  count_matrix$Row.names <- NULL
+}
+
+```
+
+```{r}
+dds <- DESeqDataSetFromMatrix(countData = count_matrix, colData = metadata, design=~condition)
+dds <- DESeq(dds)
+
+# consider removing low abundant genes
+#keep <- sum(rowSums(counts(dds)) >= 10)
+#dds <- dds[keep,]
+
+cntmatrix <- counts(dds)
+res <- results(dds)
+res <- res[order(res$padj),]
+```
+
+```{r}
+distance <- dist(x = t(cntmatrix))
+plot(hclust(distance))
+```
+
+
+```{r}
+pca <- prcomp(x = t(cntmatrix))
+pca_dist <- prcomp(x = distance)
+
+d <- as.data.frame(pca$x)
+d$condition <- metadata$condition
+d$sample <- rownames(d)
+
+ggplot(d, aes(x=PC1, y=PC2, color=condition)) + geom_point() + geom_text(aes(label = sample))
+```
+
+```{r}
+
+d <- as.data.frame(pca_dist$x)
+d$condition <- metadata$condition
+d$sample <- rownames(d)
+
+ggplot(d, aes(x=PC1, y=PC2, color=condition)) + geom_point() + geom_text(aes(label = sample))
+```
+
+```{r}
+maxFold<-max(res$log2FoldChange[!is.na(res$log2FoldChange)])
+minFold<-min(res$log2FoldChange[!is.na(res$log2FoldChange)])
+
+par(mfrow=c(1,1))
+with(res, plot(log2FoldChange, -log10(pvalue), pch=20, main="Volcano plot", xlim=c(minFold, maxFold)))
+with(subset(res, padj<.01), points(log2FoldChange, -log10(pvalue), pch=20, col="blue"))
+with(subset(res, padj<.01 & abs(log2FoldChange)>2), points(log2FoldChange, -log10(pvalue), pch=20, col="orange"))
+
+```
+
+
+```{r}
+result <- data.frame(GeneID = rownames(res),BaseMean=res$baseMean, FoldChange=res$log2FoldChange, Padj=res$padj)
+write.table(file="full_results.csv", x = result,  sep = ";", quote = FALSE, row.names = FALSE, dec = "," )
+
+```
+
+```{r}
+ups <- subset(x = result, subset = FoldChange > 5 & Padj < 0.001)
+downs <- subset(x = result, subset = FoldChange < -5 & Padj < 0.001)
+m <- rbind(ups,downs)
+rownames(m)<-m$GeneID
+sig <- cntmatrix[m$GeneID,]
+logsig <- log2(sig)
+logsig <- logsig[rowSums(logsig) != -Inf,]
+pheatmap(mat = logsig)
+
+write.table(file = "significant_genes.csv", sep = ";", quote = FALSE, x = m, dec = ",")
+```
+
