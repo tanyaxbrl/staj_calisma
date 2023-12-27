@@ -1,6 +1,6 @@
 ---
 title: "RNAseq Çalışması"
-author: "Nursena Kocatürk"
+author: "Nursena Kocatürk, Tanya Beril Korkmaz, Emrah Kırdök"
 
 ---
 
@@ -72,13 +72,16 @@ RNAseq çevremizi kuralım;
 ```bash
 conda env create --file envs/rnaseq.yaml
 ```
-
 ve çevreyi aktive edelim:
 
 ```bash
 conda activate rnaseq
 ```
+Gen sayı matrixini elde etmek için kullanacağımız araçlardan biri olan HTSeq kurulumunu yapalım. HTSeq, phyton3 ile çalışmaktdır. Bunun öncesinde phyton'a sahip olduğunuzdan ve bu sürümün güncel olduğundan emin olun. HTSeq'i rnaseq çevresine kuracağız ve programı burada çalıştıracağız.
 
+```bash
+pip install HTSeq
+```
 Çevremizi aktive ettikten sonra komut satırımızın başında aktif olan çevrenin adı parantez içinde gösterilecektir.
 
 Eğer Conda çevrenizi güncellemek isterseniz:
@@ -158,7 +161,7 @@ gunzip GCA_000007565.2_ASM756v2_genomic.gtf.gz
 
 İndirdiğimiz referans genom dosyasını gunzip ile açmalıyız. Yoksa indeksleme işlemi düzgün bir şekilde gerçekleşmez.
 
-# Kısım 1: Yeni Nesil Dizileme Verilerinin Kalite Kontrol Adımı
+# Adım 1: Yeni Nesil Dizileme Verilerinin Kalite Kontrol Adımı
 
 Bu adım için `part1.sh` betiğini kullanıyoruz. Bu betik, ilk olarak `sra-tools` paketinde bulunan programları ile, istenen fastq dosyalarını indirerek, `fastqc` programı ile kalite kontrol adımlarını gerçekleştirir.
 
@@ -181,41 +184,42 @@ Bu adımı çalıştırmak için aşağıdaki komut yazılır:
 
 `sra-tools` ile conda arasındakı uyumsuzluk nedeniyle, DNA okumlarının indirilmesi adımı şimdilik atlanmıştır.
 
-# Kısım 2: Fastq Dosyalarını İşleme Adımı
+# Adım 2: Fastq Dosyalarını İşleme Adımı
 
-Bu adım için `part2.sh` betiğini kullanıyoruz. Bu betikte, ilk olarak `results` klasörü içerisinde işlenmiş fastq dosyaların kaydedileceği `processed` isimli bir klasör oluşturmalıyız. Bu klasör içerisinde de tek yönlü 'se' ve çift yönlü 'pe' okumaların olduğu iki farklı klasör oluşturmalıyız. 
+Bu adım için `part2.sh` veya `trimmomatic.sh` betiğini kullanıyoruz. 
 
-`Cutadapt` programı ile fastqc dosyalarının işleme adımları gerçekleştirilir. 
+part2.sh betiğinin içersindeki `Cutadapt` programı da, trimmomatic.sh betiği içerisindeki trimmomatic programı da ile fastqc dosyalarının işleme adımları gerçekleştirir. 
 
-Cutadapt, adaptör dizilerini, primerleri ve diğer istenmeyen dizileri yüksek verimli dizileme verilerinden kaldırmak için kullanılan yazılım aracıdır. 
+Her ikisi de adaptör dizilerini, primerleri ve diğer istenmeyen dizileri yüksek verimli dizileme verilerinden kaldırmak için kullanılan yazılım aracıdır.
 
-Cutadapt komutları `cutadapt_se.sh’`ve `cutadapt_pe.sh` betik dosyalarında yer alır.
+Dikkat edelim, bu betiklerin sonunda tekrar fastq aracı ile karşılaşacaksınız. Süreci hızlandırmak için bu araç bu betiklerin içerisine eklenmiştir. Aslında bu komut satırının yaptığı iş `part1.sh` betiği ile tamamen aynıdır. Eğer bu betiklerin içerisine fastq aracı tekrar eklenmeseydi, bu sefer `part1.sh` betiğini tekrar çalıştırmamız, çalıştırmadan önce girdi ve çıktıların dosya konumlarını kod içerisinde tekrar düzenlememiz gerekecekti.
+
+Cutadapt komutları `cutadapt_se.sh` ve `cutadapt_pe.sh` betik dosyalarında; trimmomatic komutları da `trimmomatic_pe.sh` ve `trimmomatic_se.sh` betik dosyalarında yer alır. Bu betik dosyalarına scripts klasöründen ulaşabilirsiniz.
 
 ```bash
 ./part2.sh data.txt
 ```
 
-# Kısım 3 ve 4: İşlenmiş Yeni Nesil Dizileme Verilerinin Referans Genoma Hizalanması
+veya
+ 
+```bash
+./trimmomatic.sh data.txt
+```
 
-## BWA ile hizalama
+# Adım 3: İşlenmiş Yeni Nesil Dizileme Verilerinin Referans Genoma Hizalanması
 
-Bu adım için `part3.sh` betiğini kullanıyoruz. Bu sefer çıktıların alınacağı dosyalar betik içerisindeki kod ile oluşturulacaktır. Bizim önden manuel olarak hazırlamamıza gerek yoktur. 
+Bu adım için `part3.sh` veya `part4.sh` betiğini kullanıyoruz. 
+`part3.sh` betiğinde BWA aracı, `part4.sh` betiğinde de Bowtie2 aracı ile çalışılmaktadır. Her iki araçla da yeni nesil dizileme verilerinin referans genoma hizalanma adımı gerçekleştirilir.
+ 
+Bu araçlar, RNA-seq okumalarını referans genoma hizalayacak ve hizalamaları bir SAM dosyası biçiminde çıkaracaktır. 
 
-`BWA` programı ile yeni nesil dizileme verilerinin referans genoma hizalanma adımı gerçekleştirilir.
-
-BWA, DNA dizilerini bir referans genoma hizalamak için kullanılan bir yazılım aracıdır. 
-
-Bu, RNA-seq okumalarını referans genoma hizalayacak ve hizalamaları bir SAM dosyası biçiminde çıkaracaktır. 
-
-Bwa komutları `bwa_se.sh`ve `bwa_pe.sh` betik dosyalarında yer alır.
+Bwa komutları `bwa_se.sh`ve `bwa_pe.sh` betik dosyalarında yer alır. Bowtie2 komutları ise `bowtie_pe.sh` ve `bowtie_se.sh` betikleri içerisindedir. Bu betiklere scripts klasöründen ulaşabilirsiniz.
 
 ```bash
 ./part3.sh data.txt
 ```
 
-## Bowtie2 ile hizalama
-
-Bowtie2 da yine okumaları referans genoma hizalayan bir araçtır.
+veya
 
 ```bash
 ./part4.sh data.txt
@@ -223,14 +227,22 @@ Bowtie2 da yine okumaları referans genoma hizalayan bir araçtır.
 
 Komutuyla bu programı çalıştıralım.
 
-# Kısım 5: Hizalanan Verilerle Sayı Matrisi Oluşturulması
+# Adım 4: Hizalanan Verilerle Sayı Matrisi Oluşturulması
 
-Bu adımda `part5.sh` betiğini kullanacağız. Bu betikle hizalama sonrası elde eedilen verilen, artık gen ifadesi düzeyinde gerçekleştirecek olduğumuz analizlerin baş rolü olan gen ifadesi matrisleri oluşturulacaktır. Artık bu aşamada R çevresini aktive etmeliyiz. 
+Bu adımda `part5.sh` veya `htseq-counts.sh` betiklerini kullanacağız. part5.sh betiğinde part counts aracı, htseq-counts.sh betiğinde ise htseq counts aracı çalıştırılır. İkisinden birini seçebilirsiniz.
+ 
+Bu betiklerin ikisinde de hizalama sonrası elde edilen veriler, artık gen ifadesi düzeyinde gerçekleştirecek olduğumuz analizlerin baş rolü olan gen ifadesi matrisleri oluşturulacaktır. Burada dikkat etmemiz gereken bir nokta var: `part5.sh` betiğini r çerçevesinde, `htseq-counts.sh` betiğini ise rnaseq çerçevesinde çalıştırmalıyız. 
+Aşağıda verilen kodlarda, bir önceki hizalama adımında hangi hizalama aracını kullandıysak bunu belirtmeliyiz. Eğer hizalamamızı bwa aracıyla yaptıysak bowtie2 yerine bwa yazmalıyız.
 
 ```bash
-./part5.sh data.txt
+./part5.sh data.txt bowtie2
 ```
 
+veya 
+
+```bash
+htseq-counts data.txt bowtie2
+```
 betiği ile bu programı çalıştıralım.
 
 # Bonus: STAR ile hizalama
