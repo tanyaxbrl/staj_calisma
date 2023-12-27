@@ -1,5 +1,7 @@
 #!/bin/bash
 
+mkdir -p results/counts/
+
 #htseq_count [options] alignment_files gff_file or phyton -m HTSeq.scripts.count [options] alignment_files gff_file
 TOOL=$2
 
