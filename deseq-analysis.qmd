@@ -205,3 +205,51 @@ write.table(file = "significant_genes.csv", sep = ";", quote = FALSE, x = m, dec
 
 ## Silinmiş genlerin anlatım değişikliklerinin tespiti
 
+```{r}
+genes <- read.table(file = "important_genes.txt", sep = "\t", header = TRUE)
+rownames(genes) <- genes$Gene_id
+```
+
+### knock-out edilen genlerin gösterimi
+
+Knock-out edilmiş HexR geni için boxplot
+
+```{r}
+gene_id <- "PP_1021"
+boxplot(count_matrix_normalized[gene_id,]~metadata$condition, main=paste0("Gene expression of ", genes[gene_id,1]))
+```
+
+
+Knock-out edilmiş pyk geni için boxplot
+
+```{r}
+gene_id <- "PP_4301"
+boxplot(count_matrix_normalized[gene_id,]~metadata$condition, main=paste0("Gene expression of ", genes[gene_id,1]))
+
+```
+
+Knock-out edilmiş pykA geni için boxplot
+
+```{r}
+gene_id <- "PP_1362"
+boxplot(count_matrix_normalized[gene_id,]~metadata$condition, main=paste0("Gene expression of ", genes[gene_id,1]))
+```
+
+### HexR knock-outundan sonra ifadesi değişen diğer genlerin gösterimi
+
+```{r}
+other_genes <- genes[!(genes$Gene_id %in% c("PP_4301", "PP_1362", "PP_1021")), ]
+```
+
+Tek tek plot edek
+
+```{r}
+par(mfrow = c(5,2))
+par(mar = c(1,1,1,1))
+for (gene_id in other_genes$Gene_id){
+  boxplot(count_matrix_normalized[gene_id,]~metadata$condition, main=paste0("Gene expression of ", other_genes[gene_id,1]))
+}
+dev.off()
+```
+
+
