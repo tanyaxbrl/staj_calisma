@@ -9,6 +9,12 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
 ```
 
+## Giriş
+
+Bu döküman kapsamında RNA seq analizi anatılacaktır.
+
+## Metodoloji 
+
 Öncelikle kullanacağımız kütüphaneleri yüklememiz gerekli. Özellikle `DESeq2` kütüphanesini Bioconductor platformu üzerinden yüklemeniz tavsiye edilir.
 
 ```{r}
@@ -44,6 +50,7 @@ count_matrix <- read.table(file = "ht_bw_tm/counts-merged-htseq-count-bowtie2-tr
 ```{r}
 dim(count_matrix)
 ```
+## DeSeq verisi eldesi
 
 Şimdi de, elimizdeki matrisi `DESeq2` objesi haline getirelim. Bunun için `count_matrix` ve `metadata` verilerini birleştireceğiz.
 
@@ -103,6 +110,8 @@ ggplot(d, aes(x=PC1, y=PC2, color=condition)) +
   theme_bw()
 ```
 
+## Anlamlı değişen genlerin tespiti
+
 Artık karşılaştırmalı gen anlatım analizlerine başlayabiliriz. Bunu `DESeq` fonksiyonu ile gerçekleştiriyoruz.
 
 ```{r}
@@ -150,6 +159,8 @@ write.csv2(file = "outlier-genes.csv", x = outliers)
 boxplot(t(outliers))
 ```
 
+## Anlamlı değişen genlerin görselleştirilmesi
+
 Son olarak Volcano plot ile anlamlı olarak değişen genleri inceleyelim:
 
 ```{r}
@@ -191,4 +202,6 @@ pheatmap(mat = logsig, fontsize_row = 3)
 ```{r}
 write.table(file = "significant_genes.csv", sep = ";", quote = FALSE, x = m, dec = ",")
 ```
+
+## Silinmiş genlerin anlatım değişikliklerinin tespiti
 
