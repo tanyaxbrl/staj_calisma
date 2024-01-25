@@ -9,6 +9,12 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
 ```
 
+## Giriş
+
+Bu döküman kapsamında RNA seq analizi anatılacaktır.
+
+## Metodoloji 
+
 Öncelikle kullanacağımız kütüphaneleri yüklememiz gerekli. Özellikle `DESeq2` kütüphanesini Bioconductor platformu üzerinden yüklemeniz tavsiye edilir.
 
 ```{r}
@@ -36,29 +42,7 @@ kable(metadata)
 Her örneğe ait gen anlatım matrislerini alarak, tek bir matriste birleştirelim:
 
 ```{r}
-count_matrix <- read.table(file = paste0("results/counts/counts-", 
-                                         metadata$sample[1],"-", 
-                                         tool, 
-                                         ".txt"), header=T)
-count_matrix <- count_matrix[ ,c(1,7)]
-rownames(count_matrix) <- count_matrix$Geneid
-count_matrix$Geneid <- NULL
-colnames(count_matrix) <- metadata$sample[1]
-  
-for (i in 2:nrow(metadata)){
-  data <- read.table(file = paste0("results/counts/counts-", 
-                                   metadata$sample[i],"-", 
-                                   tool, 
-                                   ".txt"), header=T)
-  data <- data[ ,c(1,7)]
-  rownames(data) <- data$Geneid
-  data$Geneid <- NULL
-  colnames(data) <- metadata$sample[i]
-  count_matrix <- merge(x = count_matrix ,y = data, by = 'row.names')
-  rownames(count_matrix) <- count_matrix$Row.names
-  count_matrix$Row.names <- NULL
-}
-
+count_matrix <- read.table(file = "ht_bw_tm/counts-merged-htseq-count-bowtie2-trimmomatic.txt", header = T)
 ```
 
 Şimdi de elimizdeki sayı matirisinin boyutlarına bakalım:
@@ -66,6 +50,7 @@ for (i in 2:nrow(metadata)){
 ```{r}
 dim(count_matrix)
 ```
+## DeSeq verisi eldesi
 
 Şimdi de, elimizdeki matrisi `DESeq2` objesi haline getirelim. Bunun için `count_matrix` ve `metadata` verilerini birleştireceğiz.
 
@@ -125,6 +110,8 @@ ggplot(d, aes(x=PC1, y=PC2, color=condition)) +
   theme_bw()
 ```
 
+## Anlamlı değişen genlerin tespiti
+
 Artık karşılaştırmalı gen anlatım analizlerine başlayabiliriz. Bunu `DESeq` fonksiyonu ile gerçekleştiriyoruz.
 
 ```{r}
@@ -145,7 +132,10 @@ result <- data.frame(GeneID = rownames(res),
 Benjamini-Hochberg düzletmesine gore, 0.001'e göre anlamı olarak değişen kaç gen var? Burada `Padj` sütununu incelememiz gereklidir.
 
 ```{r}
-sum(result$Padj<0.001, na.rm = T)
+p.value <- 0.05
+fold.change <- 2
+
+sum(result$Padj < p.value, na.rm = T)
 ```
 
 Ancak bazı genlerin anlamlılık seviyesi `NA` olabilir. Bu, ya o genlerin çok düşük anlatım seviyelerine sahip olduklarını gösteren bir şey olabilir, ya da o genlerde beklenen dağılım dışında davranan genlerin varlığı yüzünden olabilir.
@@ -169,24 +159,26 @@ write.csv2(file = "outlier-genes.csv", x = outliers)
 boxplot(t(outliers))
 ```
 
+## Anlamlı değişen genlerin görselleştirilmesi
+
 Son olarak Volcano plot ile anlamlı olarak değişen genleri inceleyelim:
 
 ```{r}
-maxFold<-max(res$log2FoldChange[!is.na(res$log2FoldChange)])
+maxFold <- max(res$log2FoldChange[!is.na(res$log2FoldChange)])
 minFold<-min(res$log2FoldChange[!is.na(res$log2FoldChange)])
 
 par(mfrow=c(1,1))
 with(res, plot(log2FoldChange, -log10(pvalue), pch=20, main="Volcano plot", xlim=c(minFold, maxFold)))
-with(subset(res, padj<.01), points(log2FoldChange, -log10(pvalue), pch=20, col="blue"))
-with(subset(res, padj<.01 & abs(log2FoldChange)>2), points(log2FoldChange, -log10(pvalue), pch=20, col="orange"))
+with(subset(res, padj< p.value), points(log2FoldChange, -log10(pvalue), pch=20, col="blue"))
+with(subset(res, padj< p.value & abs(log2FoldChange) > fold.change), points(log2FoldChange, -log10(pvalue), pch=20, col="orange"))
 
 ```
 
 Şimdi de 0.001'e göre 5 kat fazla artan ya da 5 kattan fazla azalan genleri belileyip hem bir heatmap yapalım hem de bu genleri yazalım:
 
 ```{r}
-ups <- subset(x = result, subset = FoldChange > 5 & Padj < 0.001)
-downs <- subset(x = result, subset = FoldChange < -5 & Padj < 0.001)
+ups <- subset(x = result, subset = FoldChange > fold.change & Padj < p.value)
+downs <- subset(x = result, subset = FoldChange < -fold.change & Padj < p.value)
 m <- rbind(ups,downs)
 rownames(m)<-m$GeneID
 ```
@@ -205,7 +197,59 @@ Son olarakısı haritasını elde edelim ve bu genleri kaydedelim.
 
 ```{r}
 pheatmap(mat = logsig, fontsize_row = 3)
+```
 
+```{r}
 write.table(file = "significant_genes.csv", sep = ";", quote = FALSE, x = m, dec = ",")
 ```
+
+## Silinmiş genlerin anlatım değişikliklerinin tespiti
+
+```{r}
+genes <- read.table(file = "important_genes.txt", sep = "\t", header = TRUE)
+rownames(genes) <- genes$Gene_id
+```
+
+### knock-out edilen genlerin gösterimi
+
+Knock-out edilmiş HexR geni için boxplot
+
+```{r}
+gene_id <- "PP_1021"
+boxplot(count_matrix_normalized[gene_id,]~metadata$condition, main=paste0("Gene expression of ", genes[gene_id,1]))
+```
+
+
+Knock-out edilmiş pyk geni için boxplot
+
+```{r}
+gene_id <- "PP_4301"
+boxplot(count_matrix_normalized[gene_id,]~metadata$condition, main=paste0("Gene expression of ", genes[gene_id,1]))
+
+```
+
+Knock-out edilmiş pykA geni için boxplot
+
+```{r}
+gene_id <- "PP_1362"
+boxplot(count_matrix_normalized[gene_id,]~metadata$condition, main=paste0("Gene expression of ", genes[gene_id,1]))
+```
+
+### HexR knock-outundan sonra ifadesi değişen diğer genlerin gösterimi
+
+```{r}
+other_genes <- genes[!(genes$Gene_id %in% c("PP_4301", "PP_1362", "PP_1021")), ]
+```
+
+Tek tek plot edek
+
+```{r}
+par(mfrow = c(5,2))
+par(mar = c(1,1,1,1))
+for (gene_id in other_genes$Gene_id){
+  boxplot(count_matrix_normalized[gene_id,]~metadata$condition, main=paste0("Gene expression of ", other_genes[gene_id,1]))
+}
+dev.off()
+```
+
 
