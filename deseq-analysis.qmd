@@ -1,21 +1,43 @@
 ---
-title: "Differential Expression Analysis"
+title: "Ayrımsal Gen Anlatım Analizi"
 author: "Tanya Beril Korkmaz, Nursena Kocatürk, Emrah Kırdök"
-date: "2023-12-24"
-output: html_document
+date: "2024-01-22"
+lang: tr
+format:
+  html:
+   embed-resources: true
+  pdf:
+    documentclass: scrreport
+    toc: true
+    number-sections: true
+    colorlinks: true
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
+knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE)
+
+make_heatmap <- function(p.value = 0.05, fold.change = 2, result = result, gene_names = FALSE, font_size = 5){
+  ups <- subset(x = result, subset = log2FoldChange > fold.change & padj < p.value)
+  downs <- subset(x = result, subset = log2FoldChange < -fold.change & padj < p.value)
+  m <- rbind(ups,downs)
+  sig <- count_matrix_normalized[m$GeneID,]
+  logsig <- log2(sig)
+  logsig[logsig == -Inf]<-0
+  rownames(logsig) <- paste(result[rownames(m),c("Gene_name")], result[rownames(m),c("GeneID")], sep = "-")
+  pheatmap(mat = logsig, show_rownames = gene_names, fontsize_row = font_size)
+}
+
 ```
 
-## Giriş
+# Giriş
 
-Bu döküman kapsamında RNA seq analizi anatılacaktır.
+Bu döküman kapsamında *Pseudomonas putida* bakterisine ait RNA dizileme veri analizi sonuçları sunulacaktır.
 
-## Metodoloji 
+# Metodoloji 
 
-Öncelikle kullanacağımız kütüphaneleri yüklememiz gerekli. Özellikle `DESeq2` kütüphanesini Bioconductor platformu üzerinden yüklemeniz tavsiye edilir.
+## Kütüphaneler
+
+Öncelikle kullanacağımız kütüphaneleri yüklememiz gerekli. Özellikle `DESeq2` kütüphanesini **Bioconductor** platformu üzerinden yüklemeniz tavsiye edilir. Bu sayede paketlerin en güncel sürümlerine ulaşabilirsiniz.
 
 ```{r}
 library("DESeq2")
@@ -23,41 +45,52 @@ library("pheatmap")
 library("ggplot2")
 library("kableExtra")
 library("ggrepel")
+library("reshape2")
+library("readr")
+library("dendextend")
+library("ggpubr")
 ```
 
-Örneklerimizin sahip oldukları metadata bilgilerini yükleyelim. 
+## Genom anotasyon
+
+Genome anotasyon dosyası, Pseudomonas.org internet sitesinden aşağıdaki bağlantı kullanılarak indirilmiştir. da yükleyelim ve gen isimleri ve fonksiyon bilgilerini de oluşturduğumuz yeni dosyaya entegre edelim:
 
 ```{r}
+gtf <- as.data.frame(read_delim(file = "~/Downloads/features.txt", delim = "\t"))
+rownames(gtf) <- gtf$`Locus Tag`
+```
+
+## Veri
+
+Şimdi, Örneklerimizin sahip oldukları metadata bilgilerini yükleyelim. Aşağıdaki tabloda çalıştığımız örnekler hakkındaki metaveri bilgisi bulunmaktadır (@tbl-metadata).
+
+```{r}
+#| label: tbl-metadata
+#| tbl-cap: Örneklerimizin sahip oldukları metaveri bilgileri. Burada pe, paired-end bilgisini ifade etmektedir.
 metadata <- read.table(file = "data_ozlem_k.txt", sep = " ")
-colnames(metadata) <- c("sample", "layout", "condition")
-tool <- "bowtie2"
-```
 
-Aşağıdaki tabloda çalıştığımız örnekler hakkındaki metaveri bilgisi bulunmaktadır:
+colnames(metadata)<-c("Sample", "Layout", "Condition")
+metadata$Sample <- gsub(pattern = "_RNA", replacement = "", x = metadata$Sample )
+rownames(metadata) <- metadata$Sample
 
-```{r}
 kable(metadata)
 ```
 
-Her örneğe ait gen anlatım matrislerini alarak, tek bir matriste birleştirelim:
+Şimdi de, çalışmalarımızdan elde ettiğimi sayı matirisini yükleyelim ve boyutlarına bakalım.
 
 ```{r}
-count_matrix <- read.table(file = "ht_bw_tm/counts-merged-htseq-count-bowtie2-trimmomatic.txt", header = T)
+count_matrix <- as.matrix(read.table(file = "11.01.2024_results/count-matrix-htseq-updated.txt", header = T))
+colnames(count_matrix) <- gsub(pattern = "_RNA", replacement = "", x = colnames(count_matrix))
 ```
 
-Şimdi de elimizdeki sayı matirisinin boyutlarına bakalım:
-
-```{r}
-dim(count_matrix)
-```
-## DeSeq verisi eldesi
+Elimizde`r ncol(count_matrix)` tane örneğe ait `r nrow(count_matrix)` tane gen anlatım verisi bulunmaktadır.
 
 Şimdi de, elimizdeki matrisi `DESeq2` objesi haline getirelim. Bunun için `count_matrix` ve `metadata` verilerini birleştireceğiz.
 
 ```{r}
 dds <- DESeqDataSetFromMatrix(countData = count_matrix, 
                               colData = metadata, 
-                              design=~condition)
+                              design=~Condition)
 ```
 
 Sonraki aşamada ise düşük anlatıma sahip olan genleri belirleyelim. Bu aşama için tam bir değer aslında yok. Bir genin bütün örneklerdeki anlatımının, ortalaması 10'un altındaysa, bu gen düşük anlatıma sahip bir gen olarak kabul edilebilir.
@@ -68,7 +101,7 @@ keep <- rowMeans(counts(dds)) >= 10
 deleted <- rowMeans(counts(dds)) < 10
 ```
 
-Yaptığımız analize göre, anlatımı çok düşük olan `r length(deleted)` tane gen bulunmaktadır. Bu genler aslında hiç anlatımı olmayan genlere karşılık gelebilirler.
+Yaptığımız analize göre, anlatımı çok düşük olan `r length(sum(deleted))` tane gen bulunmaktadır. Bu genler aslında hiç anlatımı olmayan genlere karşılık gelebilirler.
 
 Şimdi bu genler alıp bir dosyaya yazalım.
 
@@ -83,59 +116,84 @@ dds <- dds[keep,]
 dds <- DESeq(dds)
 ```
 
-Şimdi de normalize edilmiş gen anlatım matrisini alalım.
+Şimdi de normalize edilmiş gen anlatım matrisini alalım. İlerleyen kalite kontrol aşamalarında, bu sayı matrisini kullanacağız.
 
 ```{r}
-count_matrix_normalized <- counts(dds, normalized=T)
+count_matrix_normalized <- counts(dds, normalized = T)
 ```
 
-Kümeleme analizi ile verimizin nasıl gruplandığını inceleyelim:
+# Sonuçlar
+
+## Kalite kontrol
+
+İlk olarak verimizin kalite kontrolünü gerçekleştirmeliyiz. Bu sayede verimizde bulunabilecek potansiyel karıştırıcı (*confounding*) etkileri tespit edebiliriz. Kümeleme analizi ile verimizin nasıl gruplandığını inceleyelim (@fig-clustering)
 
 ```{r}
-plot(hclust(dist(x = t(count_matrix_normalized))))
+#| label: fig-clustering
+#| fig-cap: Normalize edilmiş RNA dizileme verisi ile oluşturulmuş dendrogramlar. Şekil incelendiğinde, kontrol ve knock-out örnekleri, gen anlatım değerlerine göre ayrı dallarda gruplanmıştır. Bu da iki grup arasında gen anlatım farkını işaret etmektedir.
+dendro <- as.dendrogram(hclust(dist(x = t(count_matrix_normalized))))
+dendro <- dendro %>% set("labels", paste(metadata[dendro %>% labels(), 1], metadata[dendro %>% labels(), 3], sep="-"))
+
+par(mar=c(2,2,1,7)); plot(dendro, horiz = T)
+rm(dendro)
 ```
 
-Şimdi de PCA ile bir analiz gerçekleştirelim.
+@fig-clustering incelendiğnde, kontrol ve knockout örneklerinin iki ayrı gruba bölündüğü açık bir şekilde görülmektedir.
+
+Şimdi de biricil öz bileşen tahlili (PCA, principal component analysis) ile bir analizi gerçekleştirelim (@fig-pca). Bu sayede kümeleme analizinden elde edilmiş grafiğin (@fig-clustering), daha görsel bir versiyonu elde edilebilir. Bu şekilde bakıldığında da, kontrol ve knock-out örneklerinin güzel bir şekilde birbirlerinden ayrıldıkları görülebilir.
 
 ```{r}
+#| label: fig-pca
+#| fig-cap: Normalize edilmiş RNA dizileme verisi ile oluşturulmuş birincil öz bileşen tahlili grafikleri. Knock-out örnekleri, gen anlatım profilleri açısından birbirlerine daha çok benzmektedir. Bu yüzden yakın kümelenme göstermişlerdir. Kontrol örneklerinde ise belirgin bir farklılık bulunmaktadır. PC1 ve PC2 (a), PC1 ve PC3 (b)
+#| 
 pca<-prcomp(x = t(count_matrix_normalized))
 
 d <- as.data.frame(pca$x)
-d$condition <- metadata$condition
-d$sample <- metadata$sample
+d$Condition <- metadata$Condition
+d$Sample <- metadata$Sample
 
-ggplot(d, aes(x=PC1, y=PC2, color=condition)) + 
-  geom_point() + 
-  geom_text_repel(aes(label = sample)) + 
+p1 <- ggplot(d, aes(x=PC1, y=PC2)) + 
+  geom_point(aes(color=Condition)) + 
+  geom_text_repel(aes(label = Sample)) + 
   theme_bw()
+
+p2 <- ggplot(d, aes(x=PC1, y=PC3)) + 
+  geom_point(aes(color=Condition)) + 
+  geom_text_repel(aes(label = Sample)) + 
+  theme_bw()
+
+ggarrange(plotlist = list(p1,p2), common.legend = T, labels = c("a", "b"))
+
 ```
 
-## Anlamlı değişen genlerin tespiti
+## Karşılaştırmalı gen anlatım analizi
 
 Artık karşılaştırmalı gen anlatım analizlerine başlayabiliriz. Bunu `DESeq` fonksiyonu ile gerçekleştiriyoruz.
 
 ```{r}
-res <- results(dds)
-res <- res[order(res$padj),]
+result <- results(dds)
+result <- as.data.frame(result[order(result$padj),])
+result$GeneID <- rownames(result)
 ```
 
-Elimizdeki sonucu bir veri çerçevesine aktaralım:
+Şimdi sonuçlarımıza, gen anotasyon bilgilerini ekleyelim:
 
 ```{r}
-result <- data.frame(GeneID = rownames(res),
-  BaseMean=res$baseMean, 
-  FoldChange=res$log2FoldChange, 
-  Padj=res$padj)
-
+result$Gene_name<-gtf[rownames(result),c("Gene Name")]
+result$Product_description<-gtf[rownames(result),c("Product Description")]
 ```
 
-Benjamini-Hochberg düzletmesine gore, 0.001'e göre anlamı olarak değişen kaç gen var? Burada `Padj` sütununu incelememiz gereklidir.
+P değerleri ve kat artış bilgilerini ayarlayalım. Bu değerler, proje metninden elde edilmiştir:
 
 ```{r}
 p.value <- 0.05
 fold.change <- 2
+```
 
-sum(result$Padj < p.value, na.rm = T)
+Benjamini-Hochberg düzletmesine gore, `r p.value` değerine göre anlamı olarak değişen kaç gen var? Burada `Padj` sütununu incelememiz gereklidir.
+
+```{r}
+sum(result$padj < p.value, na.rm = T)
 ```
 
 Ancak bazı genlerin anlamlılık seviyesi `NA` olabilir. Bu, ya o genlerin çok düşük anlatım seviyelerine sahip olduklarını gösteren bir şey olabilir, ya da o genlerde beklenen dağılım dışında davranan genlerin varlığı yüzünden olabilir.
@@ -143,7 +201,7 @@ Ancak bazı genlerin anlamlılık seviyesi `NA` olabilir. Bu, ya o genlerin çok
 Kaç tane böyle gen var acaba?
 
 ```{r}
-outliers <- count_matrix[result[is.na(result$Padj),]$GeneID,]
+outliers <- count_matrix_normalized[result[is.na(result$padj),]$GeneID,]
 nrow(outliers)
 ```
 
@@ -153,34 +211,36 @@ Bu genleri bir veri çerçevesi olarak kaydedelim:
 write.csv2(file = "outlier-genes.csv", x = outliers)
 ```
 
-Şimdi de bir kutu grafiği ile görselleştrelim:
+Şimdi de bir kutu grafiği ile görselleştrelim (@fig-outliers). Bu şekle bakılacak olursa, tespit edilen genlerin anlatım seviyeleri, bazı örneklerde aykırı bir örüntüye sahip. Yani normal dağılımın oldukça dışında. Bu genlerden düzgün bir ayrımsal gen anlatım analizi gerçekleştirilemez.
 
 ```{r}
-boxplot(t(outliers))
-```
-
-## Anlamlı değişen genlerin görselleştirilmesi
-
-Son olarak Volcano plot ile anlamlı olarak değişen genleri inceleyelim:
-
-```{r}
-maxFold <- max(res$log2FoldChange[!is.na(res$log2FoldChange)])
-minFold<-min(res$log2FoldChange[!is.na(res$log2FoldChange)])
-
-par(mfrow=c(1,1))
-with(res, plot(log2FoldChange, -log10(pvalue), pch=20, main="Volcano plot", xlim=c(minFold, maxFold)))
-with(subset(res, padj< p.value), points(log2FoldChange, -log10(pvalue), pch=20, col="blue"))
-with(subset(res, padj< p.value & abs(log2FoldChange) > fold.change), points(log2FoldChange, -log10(pvalue), pch=20, col="orange"))
+#| label: fig-outliers
+#| fig-cap: Aykırı veriler yüzünden, analizler dışında bırakların genlere ait kutu grafikleri. 
+outliers <- melt(outliers)
+colnames(outliers) <- c("Gene ID", "Sample", "Expression")
+ggplot(outliers, aes(x=`Gene ID`, y = Expression)) + geom_boxplot() + theme_bw() + theme(axis.text.x = element_text(angle = 45, vjust = 0.5))
 
 ```
-
-Şimdi de 0.001'e göre 5 kat fazla artan ya da 5 kattan fazla azalan genleri belileyip hem bir heatmap yapalım hem de bu genleri yazalım:
+Son olarak Volcano plot ile anlamlı olarak değişen genleri inceleyelim. Burada, volcano plot isminde bir grafik oluşturabiliriz (@fig-volcano). Grafiğe bakarsak, `x` ekseni, kncok-out örneklerinde kontrol örneklerine göre, $log2$ tabanında kat artış veya azalışını ifade etmektedir.
 
 ```{r}
-ups <- subset(x = result, subset = FoldChange > fold.change & Padj < p.value)
-downs <- subset(x = result, subset = FoldChange < -fold.change & Padj < p.value)
+#| label: fig-volcano
+#| fig-cap: Ayrımsal gen anlatım analizi sonucunda elde edilen volkan grafiği. Bu grafikte, kırmızı ile gösterilen genler, p < 0.05' e göre anlamlı bir şekilde 2 kat artış ya da azalış gösteren genleri işaret etmektedir. Bu değerler, proje metninde belirtildiği şekilde kullanılmıştır.
+#| 
+result$Significant <- abs(result$log2FoldChange) > fold.change & result$padj<p.value
+result$Significant<-factor(result$Significant,levels = c(TRUE, FALSE, NA))
+
+ggplot(data = result, 
+       aes(x = log2FoldChange, y = -log10(pvalue))) + 
+  geom_point(aes(col=Significant)) + theme_bw()
+```
+
+Şimdi de `r p.value` p değerine anlamlı olarak, `r fold.change` kat fazla artan ya da `r fold.change` kattan fazla azalan genleri belileyip hem bir ısı grafiği yapalım hem de bu genleri yazalım:
+
+```{r}
+ups <- subset(x = result, subset = log2FoldChange > fold.change & padj < p.value)
+downs <- subset(x = result, subset = log2FoldChange < -fold.change & padj < p.value)
 m <- rbind(ups,downs)
-rownames(m)<-m$GeneID
 ```
 
 Bu genlerin sahip olduğu normalize edilmiş anlatım verilerini, ısı haritası ile görselleştirmek için, normalize edilmiş matris içinden elde edelim. Daha sonra `log2` fonkisyonu ile 2'nin katlarına transforme edelim.
@@ -193,63 +253,264 @@ logsig <- log2(sig)
 logsig[logsig == -Inf]<-0
 ```
 
-Son olarakısı haritasını elde edelim ve bu genleri kaydedelim.
+Son olarak ısı haritasını elde edelim. Burada projede belirlenen eşik değerler kullanılmıştır (@fig-heatmap-all)
 
 ```{r}
-pheatmap(mat = logsig, fontsize_row = 3)
+#| label: fig-heatmap-all
+#| fig-cap: p<0.05'e göre 2 kat fazla artış ya da azalış gösteren genlere ait ısı grafiği. Isı grafiği, çok fazla sayıda gen olduğu için düzgün bir şekilde görülmemektedir.
+pheatmap(mat = logsig, show_rownames = F)
+```
+
+Daha rahat bir görünüm oluşması için, genler bir de `p < 0.05` değerine göre, farklı fold change değerleri kullanılarak farklı grafikler oluşturulmuştur:
+
+- Fold change 4 @fig-heatmap-fc4
+- Fold change 5 @fig-heatmap-fc5
+- Fold change 6 @fig-heatmap-fc6
+- Fold change 7 @fig-heatmap-fc7
+- Fold change 8 @fig-heatmap-fc8
+
+
+
+```{r}
+#| label: fig-heatmap-fc4
+#| fig-cap: p<0.05'e göre 4 kat fazla artış ya da azalış gösteren genlere ait ısı grafiği. Isı grafiği, çok fazla sayıda gen olduğu için düzgün bir şekilde görülmemektedir.
+make_heatmap(p.value = 0.05, fold.change = 4, result = result, gene_names = FALSE, font_size = 3)
 ```
 
 ```{r}
-write.table(file = "significant_genes.csv", sep = ";", quote = FALSE, x = m, dec = ",")
+#| label: fig-heatmap-fc5
+#| fig-cap: p<0.05'e göre 5 kat fazla artış ya da azalış gösteren genlere ait ısı grafiği. Isı grafiği, çok fazla sayıda gen olduğu için düzgün bir şekilde görülmemektedir. Ancak font büyüklüğü buna izin vermiştir.
+make_heatmap(p.value = 0.05, fold.change = 5, result = result, gene_names = FALSE, font_size = 3)
 ```
 
-## Silinmiş genlerin anlatım değişikliklerinin tespiti
+```{r}
+#| label: fig-heatmap-fc6
+#| fig-cap: p<0.05'e göre 6 kat fazla artış ya da azalış gösteren genlere ait ısı grafiği. Isı grafiği, çok fazla sayıda gen olduğu için düzgün bir şekilde görülmemektedir. Ancak font büyüklüğü buna izin vermiştir.
+make_heatmap(p.value = 0.05, fold.change = 6, result = result, gene_names = TRUE, font_size = 5)
+```
 
 ```{r}
-genes <- read.table(file = "important_genes.txt", sep = "\t", header = TRUE)
+#| label: fig-heatmap-fc7
+#| fig-cap: p<0.05'e göre 7 kat fazla artış ya da azalış gösteren genlere ait ısı grafiği. Isı grafiği, çok fazla sayıda gen olduğu için düzgün bir şekilde görülmemektedir. Ancak font büyüklüğü buna izin vermiştir.
+make_heatmap(p.value = 0.05, fold.change = 7, result = result, gene_names = TRUE, font_size = 6)
+```
+
+```{r}
+#| label: fig-heatmap-fc8
+#| fig-cap: p<0.05'e göre 8 kat fazla artış ya da azalış gösteren genlere ait ısı grafiği. Isı grafiği, çok fazla sayıda gen olduğu için düzgün bir şekilde görülmemektedir. Ancak font büyüklüğü buna izin vermiştir.
+make_heatmap(p.value = 0.05, fold.change = 8, result = result, gene_names = TRUE, font_size = 6)
+```
+
+## *P. putida* genomundan silinen genlerin anlatım seviyeleri
+
+Şimdi knock out edilmiş genlerin anlatım seviyelerini inceleyelim. Doğal olarak bu genlerin 0 anlatım seviyelerine sahip olmalarını bekliyoruz.
+
+```{r}
+genes <- read.table(file = "~/Downloads/important_genes_updated.txt", sep = "\t", header = TRUE)
+
 rownames(genes) <- genes$Gene_id
+
+more_genes <- as.data.frame(t(count_matrix_normalized[genes$Gene_id, ]))
+more_genes$Condition <- metadata$Condition
+more_genes <- melt(more_genes)
+colnames(more_genes)<- c("Condition", "Gene_ID", "Expression")
+
 ```
 
-### knock-out edilen genlerin gösterimi
-
-Knock-out edilmiş HexR geni için boxplot
+İlk olarak *hexR* genini inceleyelim (@fig-hexr).
 
 ```{r}
+#| label: fig-hexr
+#| fig-cap: HexR geninde görülen gen anlatım değişikliği. Burada kutu grafikleri, belirli bir koşulda bulunan gen anlatım verilerinin dağılımlarını göstermektedir. 
+
 gene_id <- "PP_1021"
-boxplot(count_matrix_normalized[gene_id,]~metadata$condition, main=paste0("Gene expression of ", genes[gene_id,1]))
+
+ggplot(more_genes[more_genes$Gene_ID == gene_id, ],
+       aes(x=Condition, y = Expression)) + geom_boxplot() + 
+  ggtitle(label = paste0("Differential gene expression of ", genes[gene_id, 1]),
+          subtitle = paste0("Adjusted Pvalue < 0.05: ",result$padj[result$GeneID==gene_id] < 0.05, ", Fold Change: ", round(result$log2FoldChange[result$GeneID==gene_id], 2))) + theme_bw()
 ```
 
-
-Knock-out edilmiş pyk geni için boxplot
+Daha sonra *pyk* geni (@fig-pyk)
 
 ```{r}
+#| label: fig-pyk
+#| fig-cap: pyk geninde görülen gen anlatım değişikliği. Burada kutu grafikleri, belirli bir koşulda bulunan gen anlatım verilerinin dağılımlarını göstermektedir.
+
 gene_id <- "PP_4301"
-boxplot(count_matrix_normalized[gene_id,]~metadata$condition, main=paste0("Gene expression of ", genes[gene_id,1]))
 
+ggplot(more_genes[more_genes$Gene_ID == gene_id, ],
+       aes(x=Condition, y = Expression)) + geom_boxplot() + 
+  ggtitle(label = paste0("Differential gene expression of ", genes[gene_id, 1]),
+          subtitle = paste0("Adjusted Pvalue < 0.05: ",result$padj[result$GeneID==gene_id] < 0.05, ", Fold Change: ", round(result$log2FoldChange[result$GeneID==gene_id], 2))) + theme_bw()
 ```
 
-Knock-out edilmiş pykA geni için boxplot
+Daha sonra *pykA* geni (@fig-pykA)
 
 ```{r}
+#| label: fig-pykA
+#| fig-cap: pykA geninde görülen gen anlatım değişikliği. Burada kutu grafikleri, belirli bir koşulda bulunan gen anlatım verilerinin dağılımlarını göstermektedir.
+
 gene_id <- "PP_1362"
-boxplot(count_matrix_normalized[gene_id,]~metadata$condition, main=paste0("Gene expression of ", genes[gene_id,1]))
+
+ggplot(more_genes[more_genes$Gene_ID == gene_id, ],
+       aes(x=Condition, y = Expression)) + geom_boxplot() + 
+  ggtitle(label = paste0("Differential gene expression of ", genes[gene_id, 1]),
+          subtitle = paste0("Adjusted Pvalue < 0.05: ",result$padj[result$GeneID==gene_id] < 0.05, ", Fold Change: ", round(result$log2FoldChange[result$GeneID==gene_id], 2))) + theme_bw()
 ```
 
-### HexR knock-outundan sonra ifadesi değişen diğer genlerin gösterimi
+## hexR tarafından baskılanan genlerin durumu - 1
+
+Şimdi diğer genlere geçelim. Bildiğimiz üzere *hexR* bir transkripsiyon faktörü ve bazı genleri baskılıyor. Bu adımda, *hexR* geninin baskıladığı genelere ne olmuş onlara bakalım (@fig-hexr-repressed-1). Buradaki genler doğrudan Özlem hoca'dan alınmıştır.
 
 ```{r}
-other_genes <- genes[!(genes$Gene_id %in% c("PP_4301", "PP_1362", "PP_1021")), ]
+#| label: fig-hexr-repressed-1
+#| fig-cap: Knock out dışındaki genlerde görülen anlatım değişiklilkleri
+
+other_genes <- more_genes[!(more_genes$Gene_ID %in% c("PP_4301", "PP_1362", "PP_1021")), ]
+
+ggplot(more_genes, aes(x=Condition, y = Expression)) + 
+  geom_boxplot() + theme_bw() + 
+  facet_wrap(facets = .~Gene_ID, nrow=5, ncol=5, scales = "free_y")
 ```
 
-Tek tek plot edek
+Bu genlerin anlatım seviyelerinde farklılıkları ve anlamlılık seviyelerini bir tablo haline getirelim (@tbl-hexr-repressed-1). 
 
 ```{r}
-par(mfrow = c(5,2))
-par(mar = c(1,1,1,1))
-for (gene_id in other_genes$Gene_id){
-  boxplot(count_matrix_normalized[gene_id,]~metadata$condition, main=paste0("Gene expression of ", other_genes[gene_id,1]))
-}
-dev.off()
+#| label: tbl-hexr-repressed-1
+#| tbl-cap: hexR tarafından baskılanan genlerin durumu. Burada Fold Change sütunu, log2 kat artışı veya azalışını göstermektedir. Significance ise, gen anlatımlarının kalibre edilmiş p değeri 0.05'e göre anlamlı değişim gösterip göstermediklerini belirtmektedir. Bunlar hedef genler olduğu için, projede belirtilen logfold change değerleri ihmal edilmiştir, bu yüzden bazı genler 2'den daha az artış veya azalış gösterebilir.
+#| 
+more_genes_table <- data.frame(genes$Gene_id, 
+                               genes$Gene_name, 
+                               result[genes$Gene_id,]$log2FoldChange, 
+                               result[genes$Gene_id,]$padj<0.05)
+colnames(more_genes_table) <- c("Gene ID", "Gene Name", "Fold Change", "Significance (p<0.05)")
+kable(x = more_genes_table)
 ```
+
+Şimdi de bu genleri bir ısı grafiği şeklinde görselleştirelim (@fig-hexr-repressed-heatmap-1)
+
+```{r}
+#| label: fig-hexr-repressed-heatmap-1
+#| fig-cap: hexr tarafından basklılanan genlerde gözlenen değişimin ısı grafiği. Bu grafik oluşturulurken, Özlem hoca'dan gelen liste doğrudan kullanılmıştır. Bir önce oluşturulan tabloda bulunan genlerin ısı grafiğine dönüştürülmüş hali.
+#| 
+sig_mini <- count_matrix_normalized[genes$Gene_id,]
+logsig_mini <- log2(sig_mini)
+logsig_mini[logsig_mini == -Inf]<-0
+rownames(logsig_mini) <- genes[rownames(sig_mini),]$Gene_name
+pheatmap(mat = logsig_mini, cellwidth = 10, cellheight = 10, cutree_rows = 4, cutree_cols = 2)
+
+```
+
+## hexR tarafından baskılanan genlerin durumu - 2 (makaleden elde edilen)
+
+Ayrıca makaleyi incelersek göre başka genler de hexR baskılama sistmeine ait. peki onlara ne oluyor? Bu analiz için Engineering glucose metabolism for enhanced muconic acid production in
+Pseudomonas putida KT2440 makalesinde bulunan ve *hexR* geni tarafından baskılanan gen isimleri kullanılmıştır.
+
+```{r}
+#| label: tbl-hexr-repressed-2
+#| tbl-cap: hexR tarafından baskılanan diğer genlerin durumu, genler makaleden alındı. 
+article_hexr <- read.table(file = "~/Downloads/hexr_repressed_article.txt", sep = "\t", header = TRUE)
+rownames(article_hexr) <- article_hexr$Gene_id
+
+article_genes <- as.data.frame(t(count_matrix_normalized[article_hexr$Gene_id, ]))
+article_genes$Condition <- metadata$Condition
+article_genes <- melt(article_genes)
+colnames(article_genes)<- c("Condition", "Gene_ID", "Expression")
+
+article_genes_table <- data.frame(article_hexr$Gene_id, article_hexr$Gene_name, result[article_hexr$Gene_id, "log2FoldChange"], result[article_hexr$Gene_id, "padj"]<0.05)
+colnames(article_genes_table) <- c("Gene ID", "Gene Name", "Fold Change", "Significance (p<0.05)")
+kable(x = article_genes_table)
+```
+
+Bu grafik ise, bir önceki tablonun kutu grafiği haline getirilmiş şekli (@fig-hexr-repressed-2):
+
+```{r}
+#| label: fig-hexr-repressed-2
+#| fig-cap: hexR tarafından baskılanan diğer genlerin anlatım değerlerinin kutu grafiğine dönüştürülmüş hali.
+ggplot(article_genes, aes(x=Condition, y = Expression)) + 
+  geom_boxplot() + theme_bw() +
+  facet_wrap(facets = .~Gene_ID, nrow=5, ncol=5, scales = "free_y")
+```
+
+Şimdi de bu genlerin ısı grafiğini oluşturalım (@fig-hexr-repressed-heatmap-2).
+
+
+```{r}
+#| label: fig-hexr-repressed-heatmap-2
+#| fig-cap: hexr tarafından baskılanan bütün genlerdeki değişimi gösteren ısı grafiği
+
+all_genes <- rbind(genes, article_hexr)
+sig_mini <- count_matrix_normalized[all_genes$Gene_id,]
+logsig_mini <- log2(sig_mini)
+logsig_mini[logsig_mini == -Inf]<-0
+rownames(logsig_mini) <- all_genes[rownames(sig_mini),]$Gene_name
+pheatmap(mat = t(logsig_mini), cellwidth = 10, cellheight = 10, cutree_rows = 2, cutree_cols = 4, angle_col = 45, fontsize_col = 6)
+
+```
+
+## Biyolojik Ağ Analizi
+
+Peki, *hexR* tarafından başka baskılanan gen var mı? Bunun için String veri tabanındıan *Pseudomonas putida* bakterisine ait protein ağ verisini indirelim:
+
+```{r}
+network <- read.table(file = "~/Downloads/160488.protein.links.v12.0.txt", header =T)
+
+network$protein1 <- gsub(pattern = "160488.", replacement = "", x = network$protein1)
+network$protein2 <- gsub(pattern = "160488.", replacement = "", x = network$protein2)
+```
+
+Sadece *hexR* geni için network bilgisi alalım:
+
+```{r}
+hexr_network <- network[grep(pattern = "PP_1021", x = network$protein1),]
+```
+
+Bu incelemeye göre hexr ile etkileşimde bulunan `r nrow(hexr_network)` tane protein var. Peki bunlardan kaç tanesi bizim sonuç dosyalarımızda var? Bunu yaparken sadece anlamlı olan genler incelendi (p<0.05, fold change 2):
+
+```{r}
+hexr_genes_intersect <- intersect(m$GeneID, hexr_network$protein2)
+```
+
+Bu çalışmaya göre elimizde `r length(hexr_genes_intersect)` tane gen bulunmakta.
+
+Şimdi bu genlere ait verileri elde edip tablolaştıralım:
+
+```{r}
+result_hexr_genes_intersect <- result[hexr_genes_intersect,]
+```
+
+Isı grafiği oluşturalım (@fig-hexr-network)
+
+```{r}
+#| label: fig-hexr-network
+#| fig-cap: hexr tarafından baskılanan bütün genlerdeki değişim
+hexr_genes_count <- count_matrix_normalized[hexr_genes_intersect,]
+hexr_genes_log <- log2(hexr_genes_count)
+hexr_genes_log[hexr_genes_log == -Inf]<-0
+rownames(hexr_genes_log) <- paste(result_hexr_genes_intersect$Gene_name,result_hexr_genes_intersect$GeneID, sep="-")
+
+pheatmap(t(hexr_genes_log), cellwidth = 10, cellheight = 10, cutree_cols=5, angle_col = 45, fontsize_col = 6)
+```
+
+# Sonuç
+
+Elimizdeki tabloları yazdıralım
+
+Şimdi elimizdeki tabloları yazalım:
+
+```{r}
+m <- m[,c("GeneID", "baseMean", "log2FoldChange", "pvalue", "padj", "Gene_name", "Product_description")]
+colnames(m) <- c("Gene ID", "Base Mean", "Log2 Fold Change", "P-value", "P-value Adjusted", "Gene Name", "Product Description")
+write.table(file = "anlamli-degisen-genler.csv", sep = ";", quote = FALSE, row.names = F, x = m, dec = ",")
+```
+
+```{r}
+result <- result[, c("GeneID", "baseMean", "log2FoldChange", "pvalue", "padj", "Gene_name", "Product_description")]
+colnames(result) <- c("Gene ID", "Base Mean", "Log2 Fold Change", "P-value", "P-value Adjusted", "Gene Name", "Product Description")
+write.table(file = "deseq-analiz-genlerin-hepsi.csv", sep = ";", quote = FALSE, row.names = F, x = result, dec = ",")
+```
+
+
 
 
