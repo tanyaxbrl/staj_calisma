@@ -1,5 +1,0 @@
-name: htseq
-channels:
-  - bioconda
-dependencies:
-  - htseq=2.0.4

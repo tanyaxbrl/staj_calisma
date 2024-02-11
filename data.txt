@@ -1,4 +1,1 @@
-SRR7029607 se control
-SRR7029605 se control 
-SRR7405887 se zinc
-SRR7405886 se zinc
+sample layout condition
