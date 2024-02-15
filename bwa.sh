@@ -2,7 +2,7 @@
 
 mkdir -p results/alignment/bwa/
 
-REFERENCE=GCA_000007565.2_ASM756v2_genomic.fna
+REFERENCE=GCA_009858895.3.fasta.gz
 
 bwa index data/ref/${REFERENCE}
 

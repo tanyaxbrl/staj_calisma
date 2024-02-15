@@ -30,4 +30,6 @@ samtools sort results/alignment/bwa/${SRR}.bam -o results/alignment/bwa/${SRR}.s
 
 samtools index results/alignment/bwa/${SRR}.sorted.bam
 
+samtools view -h ${OUT}/${SRR}.bam > ${OUT}/${SRR}.sam
+
 rm  results/alignment/bwa/${SRR}_1_p.sai results/alignment/bwa/${SRR}_2_p.sai
