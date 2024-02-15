@@ -15,3 +15,5 @@ samtools sort ${OUT}/${SRR}.bam -o ${OUT}/${SRR}.sorted.bam
 
 samtools index ${OUT}/${SRR}.sorted.bam
 
+samtools view -h ${OUT}/${SRR}.bam > ${OUT}/${SRR}.sam
+
