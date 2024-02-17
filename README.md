@@ -41,7 +41,7 @@ Cutadapt, yüksek verimli diziliminizde arama yaparak primerleri, poly-A kuyrukl
 
 Cutadapt, bu düzeltme işleri için hataya dayanıklı primer dizisi veya adaptör bulma yardımı sağlar. Tek uçlu ve çift uçlu okumalar da çeşitli şekillerde değiştirilebilir ve filtrelenebilir. Cutadapt aynı zamanda okumaların çoğunu da çözebilir [martin_cutadapt_2011]
 
-## Ubuntu Üzerinden Cutadapt Formatını Çalıştırmak 
+### Ubuntu Üzerinden Cutadapt Formatını Çalıştırmak 
 
 Hatırlarsanız daha önce `Veri_Dizileme` adlı bir klasör oluşturmuştuk. ve klasörün içinde `cutadapt.sh, fastqc.sh, bowtie2.sh` gibi dosyaların olduğunu da söylemişitk. Az önce fasqc ile kalite analizini yaptık. Şimdi de hazırsanız işimize yaramayan adabtörlerimizi kesmeye başlayalım. Şimdi,
 
@@ -67,7 +67,7 @@ Benzer boşluk cezaları ile boşluklu hizalama tamamen Bowtie 2 tarafından des
 
 Genel olarak Bowtie 2 daha hızlıdır, daha hassastır ve kabaca 50 bp'den daha uzun okumalar için Bowtie 1'e göre daha az bellek gerektirir. Nispeten kısa okumalarda (50 bp'den az), Bowtie 1 bazen daha hassas veya daha hızlı olabilir [langmead_scaling_2019].
 
-## Ubuntu Üzerinden Bowtie2 Formatını Çalıştırmak
+### Ubuntu Üzerinden Bowtie2 Formatını Çalıştırmak
 
 Öyleyse Ubuntu ile komut satırımız tekrar çalıştıralım ve hizalamalarımızı yapalım. Bunun için `Veri_Dizileme`
 
@@ -83,7 +83,13 @@ yazalım. Bunun çıktısı olarak aşağıdaki görselde bulunan yolak oluşaca
 
 Tahmin edeceğiniz gibi yukarıdaki görselde anlatmaya çalıştığımız şey bu dizimizi hizala ve hizlama sonucu result klasörümüzün içine `alignment` adlı bir klasör oluştur ve sonuçlarımızı oraya kaydet. Öyleyse komut satırına;
 
-````markdown
+```markdown
 /.bowtie2.sh data.txt
 ```
 komutumuzu veriyoruz ve programımızı çalıştırıyoruz. Ve sonuç olarak results klasörümüzü açtığımız zaman hizlama sonucu oluşan dosyalarımız alignment adlı klasörümüzde kaydedilmiş olduğunu göreceğiz. 
+
+## Özet
+
+Üzerinde durmuş olduğumuz konu DNA/RNA dizillimini biyoinformatik bilgisi olarak öğrenmeye çalıştık. Bunun için biyoinformatikte kullanılan bazı metotlar/formatlar üzerinde durduk. Bu formatlar ile bazı işlemleri yerine getirmeye çalıştık. Mesela `fastqc` formatını komut satırı kullanarak elde edilen genom dizisinin kalite kontrolünü yaptık. Analizin sonuçları, kullanıcıya veri setinde hangi bölgelerin sorunlu olduğunu ve verilerin ne kadar güvenilir olduğunu anlamasına yardımcı olur. Daha sonra `cutadapt` formatı ile istenmeyen dizileri ortadan kaldırdık. Son olarak `bowtie2` formatı ile dizimiz için uygun olan hizalamarı yaptık.  
+
+Bu çalışmalar; hastalık araştırmaları ve tanısı, genetik çeşitliliğin anlaşılması, Genomik tıp ve tedavisi gibi insan sağlığını etkileyen alanlarla birlikte Tarımda ve çevresel uygulamarda adeta bir tosetta taşı olmuştur. 
